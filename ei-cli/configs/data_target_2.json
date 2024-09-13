@@ -1,0 +1,39 @@
+{
+    "dataTarget": {
+        "type": "MQTT",
+        "dataTargetConfiguration": {
+            "connectors": [
+                {
+                    "host": "test.mosquitto.org",
+                    "port": 1883,
+                    "secure": false,
+                    "mqttQoS": 1,
+                    "username": "",
+                    "clientId": "bserial1",
+                    "cleanSession": true,
+                    "publish": {
+                        "resultPath": {
+                            "mqttRetain": true,
+                            "mqttQos": "$MQTT_QOS",
+                            "mqttTopic": "cisco/edge-intelligence/telemetry/bserial1"
+                        }
+                    }
+                }
+            ]
+        }
+    },
+    "outputModel": {
+        "temperature": {
+            "addTimestamp": true,
+            "targetPath": "deviceData/temperature",
+            "type": "INT",
+            "emit": true
+        },
+        "pressure": {
+            "addTimestamp": true,
+            "targetPath": "deviceData/pressure",
+            "type": "STRING",
+            "emit": true
+        }
+    }
+}

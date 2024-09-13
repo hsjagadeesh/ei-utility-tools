@@ -1,0 +1,90 @@
+{
+  "name": "p001",
+  "data": {
+    "dataSources": {
+      "input": {
+        "assetId": "bserial1",
+        "type": "MQTT",
+        "dataSourceConfiguration": {
+          "port": null,
+          "secure": false,
+          "useWebSockets": false,
+          "clientId": "bclient",
+          "deviceName": "b-mqtt1",
+          "assetId": "bserial1",
+          "name": "endpoint_1883",
+          "endpoints": [
+            {
+              "clientId": "bclient",
+              "port": "1883",
+              "name": "endpoint_1883",
+              "metrics": {
+                "pressure": {
+                  "label": "pressure",
+                  "topic": "pressure",
+                  "datatype": "String"
+                },
+                "temperature": {
+                  "label": "temperature",
+                  "topic": "temperature",
+                  "datatype": "Int"
+                }
+              },
+              "secure": false,
+              "credentials": []
+            }
+          ]
+        },
+        "fields": [
+          {
+            "type": "subscription",
+            "key": "pressure",
+            "source": "/endpoints/endpoint_1883/bclient/pressure"
+          },
+          {
+            "type": "subscription",
+            "key": "temperature",
+            "source": "/endpoints/endpoint_1883/bclient/temperature"
+          }
+        ]
+      }
+    },
+    "dataTarget": {
+      "type": "MQTT",
+      "dataTargetConfiguration": {
+        "connectors": [
+          {
+            "host": "10.106.11.21",
+            "port": 1883,
+            "secure": false,
+            "mqttQoS": 1,
+            "username": "",
+            "clientId": "bserial1",
+            "cleanSession": true,
+            "publish": {
+              "resultPath": {
+                "mqttRetain": true,
+                "mqttQos": 1,
+                "mqttTopic": "cisco/edge-intelligence/telemetry/bserial1"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "outputModel": {
+      "temperature": {
+        "addTimestamp": true,
+        "targetPath": "deviceData/temperature",
+        "type": "INT",
+        "emit": true
+      },
+      "pressure": {
+        "addTimestamp": true,
+        "targetPath": "deviceData/pressure",
+        "type": "STRING",
+        "emit": true
+      }
+    }
+  }
+}
