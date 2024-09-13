@@ -1,6 +1,6 @@
 # EI Utility Tools
 
-This contains tools related to EI Local Manager 
+This repo contains tools related to EI Local Manager 
 
 ## EI-CLI
 
