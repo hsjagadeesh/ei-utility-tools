@@ -26,7 +26,7 @@ def main():
   pipeline_deploy_parser.add_argument('-i', '--ip', type=str, dest='device_ip', help='ip address of the device (mandatory for single pipeline config option)')
   pipeline_deploy_parser.add_argument('-n', '--name', type=str, dest='pipeline_name', help='name of the data pipeline (mandatory for single pipeline config option)')
   pipeline_deploy_parser.add_argument('-c', '--config-file', type=str, dest='single_pipeline_config', help='single data pipeline config file path (json)')
-  pipeline_deploy_parser.add_argument('-f', '--file', type=str, dest='multi_pipeline_config', help='multi data pipeline config file path (yaml)')
+  pipeline_deploy_parser.add_argument('-p', '--pipeline-file', type=str, dest='multi_pipeline_config', help='multi data pipeline config file path (yaml)')
 
   pipeline_undeploy_parser = pipeline_command_parser.add_parser('undeploy', help='UnDeploy single/multi data pipeline(s)')
   pipeline_undeploy_parser.add_argument('-i', '--ip', type=str, dest='device_ip', help='ip address of the device (mandatory for single pipeline config option)')
@@ -59,8 +59,6 @@ def main():
       on_undeploy(vars(args), pipeline_undeploy_parser)
     elif args.pipeline_command == 'status':
       on_status(vars(args), pipeline_status_parser)
-    elif args.pipeline_command == 'reset':
-      on_reset(vars(args), pipeline_reset_parser)
     else:
       parser.print_help()
   else:
@@ -115,9 +113,6 @@ def on_undeploy(args, parser):
 
 def on_status(args, parser):
   print("on_status ", args)
-
-def on_reset(args, parser):
-  print("on_reset ", args)
 
 if __name__ == '__main__':
     p = argparse.ArgumentParser(description='...')
