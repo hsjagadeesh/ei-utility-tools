@@ -1,84 +1,90 @@
 {
-    "name": "p002",
+    "name": "p001",
     "data": {
         "dataSources": {
             "input": {
-                "assetId": "gg-4567",
+                "assetId": "bserial1",
+                "type": "MQTT",
                 "dataSourceConfiguration": {
-                    "assetId": "gg-4567",
-                    "assetTypeId": "2ca238d5-c82a-4e35-848b-4607f918a77f",
-                    "clientId": "gg-test-1",
-                    "deviceName": "gg-mqtt-sb-1",
+                    "port": null,
+                    "secure": false,
+                    "useWebSockets": false,
+                    "clientId": "bclient",
+                    "deviceName": "b-mqtt1",
+                    "assetId": "bserial1",
+                    "name": "endpoint_1883",
                     "endpoints": [
                         {
-                            "clientId": "gg-test-1",
+                            "clientId": "bclient",
+                            "port": "1883",
+                            "name": "endpoint_1883",
                             "metrics": {
-                                "humidity": {
-                                    "datatype": "String",
-                                    "label": "humidity",
-                                    "topic": "humidity"
+                                "pressure": {
+                                    "label": "pressure",
+                                    "topic": "pressure",
+                                    "datatype": "String"
+                                },
+                                "temperature": {
+                                    "label": "temperature",
+                                    "topic": "temperature",
+                                    "datatype": "Int"
                                 }
                             },
-                            "name": "endpoint_1883",
-                            "port": "1883",
                             "secure": false,
                             "credentials": []
                         }
-                    ],
-                    "name": "endpoint_1883",
-                    "port": null,
-                    "secure": false,
-                    "useWebSockets": false
+                    ]
                 },
                 "fields": [
                     {
-                        "key": "humidity",
-                        "source": "/endpoints/endpoint_1883/gg-test-1/humidity",
-                        "type": "subscription"
+                        "type": "subscription",
+                        "key": "pressure",
+                        "source": "/endpoints/endpoint_1883/bclient/pressure"
+                    },
+                    {
+                        "type": "subscription",
+                        "key": "temperature",
+                        "source": "/endpoints/endpoint_1883/bclient/temperature"
                     }
-                ],
-                "type": "MQTT"
+                ]
             }
         },
         "dataTarget": {
+            "type": "MQTT",
             "dataTargetConfiguration": {
                 "connectors": [
                     {
-                        "cleanSession": true,
-                        "clientId": "gg-4567",
-                        "host": "10.106.11.8",
+                        "host": "10.106.11.21",
+                        "port": 1883,
+                        "secure": false,
                         "mqttQoS": 1,
-                        "port": 1884,
+                        "username": "",
+                        "clientId": "bserial1",
+                        "cleanSession": true,
                         "publish": {
                             "resultPath": {
-                                "mqttQos": 1,
                                 "mqttRetain": true,
-                                "mqttTopic": "cisco/edge-intelligence/telemetry/gg-4567"
+                                "mqttQos": 1,
+                                "mqttTopic": "cisco/edge-intelligence/telemetry/bserial1"
                             }
-                        },
-                        "secure": false,
-                        "username": ""
+                        }
                     }
                 ]
-            },
-            "type": "MQTT"
-        },
-        "outputModel": {
-            "value": {
-                "addTimestamp": true,
-                "emit": true,
-                "targetPath": "deviceData/value",
-                "type": "STRING"
             }
         },
-        "scriptedDataLogic": {
-            "enableCloudCommands": false,
-            "invokeEvery": 1000,
-            "parameters": {},
-            "productive": false,
-            "script": "\u001bbytes:dmFyIGkgPSAwOwoKZnVuY3Rpb24gaW5pdCgpIHsKbG9nZ2VyLmluZm8oJ0luaXRpYWxpemVkJyk7Cn0KCmZ1bmN0aW9uIG9uX3VwZGF0ZSgpIHsKICAKICBvdXRwdXQucHVibGlzaCgpOwp9CgpmdW5jdGlvbiBvbl90aW1lX3RyaWdnZXIoKSB7CmkrKzsKbG9nZ2VyLmluZm8oJ1RpbWUgdHJpZ2dlciA6OicgKyBpKTsKb3V0cHV0LnZhbHVlID0gInRlc3QgIiArIGk7CmxvZ2dlci5pbmZvKGlucHV0LnVua25vd19fbWVtYmVyKQogICAKfQo="
+        "outputModel": {
+            "temperature": {
+                "addTimestamp": true,
+                "targetPath": "deviceData/temperature",
+                "type": "INT",
+                "emit": true
+            },
+            "pressure": {
+                "addTimestamp": true,
+                "targetPath": "deviceData/pressure",
+                "type": "STRING",
+                "emit": true
+            }
         }
     }
 }
-
-
