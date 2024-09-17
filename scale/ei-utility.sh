@@ -52,7 +52,7 @@ stop_service() {
     if [ $NUMBER_OF_CONTAINERS == "all" ]; then
 	      NUMBER_OF_CONTAINERS=$CONTAINERS_RUNNING
 	      if  [ $NUMBER_OF_CONTAINERS -eq 0 ]; then
-             echo "No $SERVICE_NAME are running"
+                   echo "No $SERVICE_NAME are running"
 	      fi
     fi
 
@@ -62,15 +62,15 @@ stop_service() {
 	        STOP_CONTAINER_NUMBER=$CONTAINERS_RUNNING
 	        while [ $COUNTNER -le $NUMBER_OF_CONTAINERS ]; do
 	             echo "stoping and removing $CONTAINER_NAME-$STOP_CONTAINER_NUMBER container....."
-               docker stop $CONTAINER_NAME-$STOP_CONTAINER_NUMBER
+		     docker stop $CONTAINER_NAME-$STOP_CONTAINER_NUMBER
 	             docker rm $CONTAINER_NAME-$STOP_CONTAINER_NUMBER | 2> /dev/null
 	             COUNTNER=$((COUNTNER + 1 ))
-               STOP_CONTAINER_NUMBER=$((STOP_CONTAINER_NUMBER - 1))
+		     STOP_CONTAINER_NUMBER=$((STOP_CONTAINER_NUMBER - 1))
 	        done
     elif [ $CONTAINERS_RUNNING -eq 0 ]; then
           echo "No $SERVICE_NAME are running"
     else
-	         echo "Number of $SERVICE_NAME running is less then $NUMBER_OF_CONTAINERS"
+	  echo "Number of $SERVICE_NAME running is less then $NUMBER_OF_CONTAINERS"
     fi
 }
 
