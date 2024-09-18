@@ -9,6 +9,7 @@ import getpass
 
 import argparse
 import logging
+import ei_lm
 
 logger = logging.getLogger(__name__)
 cwd = os.getcwd()
@@ -98,15 +99,22 @@ def on_cli_init(cli_args, parser):
     logger.debug("EI CLI initialization failed :" + str(ex))
     print("EI CLI initialization failed : " + str(ex))
 
+def init_ei_cli():
+  # Check EI_CLI_HOME env is set or not
+  if os.getenv(EI_CLI_HOME) is None:
+    raise Exception("EI_CLI_HOME env variable is not set")
+  # TODO Create a folder called "configs" under EI_CLI_HOME directory and copy the sample configs folder
+  return True
+
 def on_pipeline_deploy(cli_args, parser):
   logger.debug("Calling on_pipeline_deploy()")
   common_password = getpass.getpass('Enter the password:')
   inventory_file = cli_args.get("inventory_file", "")
   if is_valid_string(inventory_file):
-    logger.debug("Pipeline deployment selected for " + inventory_file)
+    logger.debug("Pipeline deploy selected for " + inventory_file)
     try:
       inventory_data = load_inventory(file_name=inventory_file)
-      print(inventory_data)
+      ei_lm.execute_pipelines(inventory_data, device_pwd=common_password, operation=ei_lm.DEPLOY)
     except Exception as ex:
       print(ex)
   else:
@@ -115,10 +123,36 @@ def on_pipeline_deploy(cli_args, parser):
     parser.print_help()
 
 def on_pipeline_undeploy(cli_args, parser):
-  print("on_pipeline_undeploy", cli_args)
+  logger.debug("Calling on_pipeline_undeploy()")
+  common_password = getpass.getpass('Enter the password:')
+  inventory_file = cli_args.get("inventory_file", "")
+  if is_valid_string(inventory_file):
+    logger.debug("Pipeline un-deploy selected for " + inventory_file)
+    try:
+      inventory_data = load_inventory(file_name=inventory_file)
+      ei_lm.execute_pipelines(inventory_data, device_pwd=common_password, operation=ei_lm.UN_DEPLOY)
+    except Exception as ex:
+      print(ex)
+  else:
+    print("\nPlease provide a valid pipeline inventory file option\n")
+    logger.error("Invalid : pipeline inventory file options :" + str(inventory_file))
+    parser.print_help()
 
 def on_pipeline_status(cli_args, parser):
-  print("on_pipeline_status", cli_args)
+  logger.debug("Calling on_pipeline_status()")
+  common_password = getpass.getpass('Enter the password:')
+  inventory_file = cli_args.get("inventory_file", "")
+  if is_valid_string(inventory_file):
+    logger.debug("Pipeline status selected for " + inventory_file)
+    try:
+      inventory_data = load_inventory(file_name=inventory_file)
+      ei_lm.execute_pipelines(inventory_data, device_pwd=common_password, operation=ei_lm.STATUS)
+    except Exception as ex:
+      print(ex)
+  else:
+    print("\nPlease provide a valid pipeline inventory file option\n")
+    logger.error("Invalid : pipeline inventory file options :" + str(inventory_file))
+    parser.print_help()
 
 def on_agent_status(cli_args, parser):
   print("on_agent_status", cli_args)
@@ -129,11 +163,7 @@ def on_agent_reset(cli_args, parser):
 def on_user_change_pwd(cli_args, parser):
   print("on_user_change_pwd", cli_args)
 
-def init_ei_cli():
-  # Check EI_CLI_HOME env is set or not
-  if os.getenv(EI_CLI_HOME) is None:
-    raise Exception("EI_CLI_HOME env variable is not set")
-  return True
+
 
 def load_inventory(file_name):
   # Check EI_CLI_HOME env is set or not
