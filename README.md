@@ -10,7 +10,7 @@ TODO : Steps to use ei-cli tool
 
 ### EI Utility Containers Script
 
-*This script is used to manage Docker containers by providing options to start, stop, or check the status of running containers. It allows you to specify the number of containers to start or stop, and maps container ports dynamically based on user input.*
+*This script is used to manage Docker containers by providing options to start, stop, or check the status of running EI Utility Containers. It allows you to specify the number of containers to start or stop, and maps container ports dynamically based on user input.*
 
 ## Features
 * **Start Containers:** Start a specified number of containers using a custom image and environment variables.
@@ -25,10 +25,10 @@ TODO : Steps to use ei-cli tool
 ## Variables
 |Variable Name	|Description |
 |---------------|------------|
-|SERVICE_NAME	|Descriptive name of the service (in this case, "Utility Containers").
+|SERVICE_NAME	|Descriptive name of the service (in this case, "EI Utility Containers").
 |BUILD_ARGS	|Arguments passed when creating containers, including environment variables.
-|IMAGE_NAME	|Docker image to use for creating containers (default: nginx).
-|CONTAINER_NAME	|Base name of containers (e.g., local-manager).
+|IMAGE_NAME	|Docker image to use for creating containers (default: dockerhub-master.cisco.com/iot-darkphoenix-docker/ei-edge-testing:1.16.20).
+|CONTAINER_NAME	|Base name of containers (e.g., ei-local-manager-1).
 |EXT_PORT	|Base external port for mapping container ports to host ports (default: 9000).
 |INT_PORT	|Internal port used within the containers (default: 8008).
 |NUMBER_OF_CONTAINERS	|Number of containers to start or stop.
@@ -72,31 +72,34 @@ sh ei-container.sh status
 ```
 ## This will display the number of containers currently running.
 
-Error Handling
+## Error Handling
 If the required arguments are not provided for the start or stop commands, the script will display an error message like this:
 
-sql
-Copy code
+```bash
 ========= Incomplete Arguments, Both arguments must be provided  =========
 Exp:- sh ei-container.sh start 10|20
+```
+
 Similarly, when stopping containers, the script will ensure that the number of containers provided is not greater than the number of currently running containers.
 
-Example
+### Example
 Starting 3 containers with the default configuration:
 
-bash
-Copy code
+```bash
 sh ei-container.sh start 3
+```
+
 Stopping 2 containers:
 
-bash
-Copy code
+```bash
 sh ei-container.sh stop 2
+```
+
 Checking the status of containers:
 
-bash
-Copy code
+```bash
 sh ei-container.sh status
-Notes
-The script dynamically assigns external ports starting from the base port 9000. Each new container will map the next available port, incrementing by 1.
-Ensure you have sufficient resources to run the specified number of containers, especially when using a high number.
+```
+## Notes
+* The script dynamically assigns external ports starting from the base port 9000. Each new container will map the next available port, incrementing by 1.
+* Ensure you have sufficient resources to run the specified number of containers, especially when using a high number.
