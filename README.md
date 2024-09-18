@@ -41,36 +41,36 @@ TODO : Steps to use ei-cli tool
 * To start a specified number of containers:
 
 ```bash
-sh ei-container.sh start <number_of_containers>
-
-###For example, to start 5 containers:
-
-bash
-Copy code
+* sh ei-container.sh start <number_of_containers>
+```
+For example, to start 5 containers:
+```bash
 sh ei-container.sh start 5
-Stop Containers
-To stop a specified number of containers:
+```
+## Stop Containers
 
-bash
-Copy code
+* To stop a specified number of containers:
+
+```bash
 sh ei-container.sh stop <number_of_containers>
-For example, to stop 3 containers:
+```
+* For example, to stop 3 containers:
 
-bash
-Copy code
+```bash
 sh ei-container.sh stop 3
-To stop all running containers:
+```
+* To stop all running containers:
 
-bash
-Copy code
-sh ei-container.sh stop all
-Check Status
-To check the status of running containers:
+```bash
+* sh ei-container.sh stop all
+```
+## Check Status
+* To check the status of running containers:
 
-bash
-Copy code
+```bash
 sh ei-container.sh status
-This will display the number of containers currently running.
+```
+## This will display the number of containers currently running.
 
 Error Handling
 If the required arguments are not provided for the start or stop commands, the script will display an error message like this:
