@@ -33,7 +33,7 @@ TODO : Steps to use ei-cli tool
 |INT_PORT	|Internal port used within the containers (default: 8008).
 |NUMBER_OF_CONTAINERS	|Number of containers to start or stop.
 |CONTAINERS_RUNNING	|Number of containers that are currently running.
-|NAME_OF_CONTAINERS_RUNNING	|Retrieves the name of running containers.
+|NAME_OF_CONTAINERS_RUNNING	|Name of latest running containers.
 |START_CONTAINERS_COUNT	|Name counter for the containers, used to uniquely name them when creating.
 
 ## Usage
