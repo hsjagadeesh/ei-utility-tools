@@ -1,7 +1,8 @@
 from threading import Thread
 import logging
+import os
 
-MAX_BATCH_SIZE = 20
+MAX_BATCH_SIZE = os.getenv("EI_CLI_BATCH_SIZE", 20)
 DEPLOY = "deploy"
 UN_DEPLOY = "undeploy"
 STATUS = "status"
