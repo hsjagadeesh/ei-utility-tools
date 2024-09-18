@@ -4,12 +4,15 @@
 
 import sys
 import os
+import yaml
 
 import argparse
 import logging
 
 logger = logging.getLogger(__name__)
 cwd = os.getcwd()
+CONFIG_DIR = "configs"
+EI_CLI_HOME = "EI_CLI_HOME"
 
 def main():
 
@@ -87,7 +90,12 @@ def on_pipeline_deploy(cli_args, parser):
   logger.debug("Calling on_pipeline_deploy()")
   inventory_file = cli_args.get("inventory_file", "")
   if is_valid_string(inventory_file):
-    logger.debug("Pipeline deployment selected", inventory_file)
+    logger.debug("Pipeline deployment selected for " + inventory_file)
+    try:
+      inventory_data = load_inventory(file_name=inventory_file)
+      print(inventory_data)
+    except Exception as ex:
+      print(ex)
   else:
     print("\nPlease provide a valid pipeline inventory file option\n")
     logger.error("Invalid : pipeline inventory file options :" + str(inventory_file))
@@ -107,6 +115,33 @@ def on_agent_reset(cli_args, parser):
 
 def on_user_change_pwd(cli_args, parser):
   print("on_user_change_pwd", cli_args)
+
+def init_ei_cli():
+  # Check EI_CLI_HOME env is set or not
+  if os.getenv(EI_CLI_HOME) is None:
+    raise Exception("EI_CLI_HOME env variable is not set")
+  return True
+
+def load_inventory(file_name):
+  # Check EI_CLI_HOME env is set or not
+  if os.getenv(EI_CLI_HOME) is None:
+    raise Exception("EI_CLI_HOME env variable is not set")
+  # Check if the file exists
+  file_path = os.path.join(os.getenv(EI_CLI_HOME), CONFIG_DIR, file_name)
+  if not os.path.exists(file_path):
+    logger.error("Inventory file does not exist at path '{}'".format(file_path))
+    raise Exception("Inventory file does not exist at path '{}'".format(file_path))
+  # Load the inventory file and return the yaml object in dict
+  try:
+    logger.debug("Loading inventory file from path '{}'".format(file_path))
+    with open(file_path) as f:
+      inventory_data = yaml.safe_load(f.read())
+      logger.debug(inventory_data)
+      return inventory_data
+  except Exception as e:
+    logger.error("Failed to load/parse '{}': {}".format(file_path, e))
+    raise Exception("Failed to load/parse '{}': {}".format(file_path, e))
+  return None
 
 if __name__ == '__main__':
     p = argparse.ArgumentParser(description='...')
