@@ -37,7 +37,7 @@ TODO : Steps to use ei-cli tool
 |START_CONTAINERS_COUNT	|Name counter for the containers, used to uniquely name them when creating.
 
 ## Usage
-# Start Containers
+# Start Containers #
 * To start a specified number of containers:
 
 ```bash
@@ -47,7 +47,7 @@ For example, to start 5 containers:
 ```bash
 sh ei-container.sh start 5
 ```
-## Stop Containers
+## Stop Containers ##
 
 * To stop a specified number of containers:
 
@@ -64,13 +64,13 @@ sh ei-container.sh stop 3
 ```bash
 * sh ei-container.sh stop all
 ```
-## Check Status
+## Check Status ##
 * To check the status of running containers:
 
 ```bash
 sh ei-container.sh status
 ```
-## This will display the number of containers currently running.
+## This will display the number of containers currently running. ##
 
 ## Error Handling
 If the required arguments are not provided for the start or stop commands, the script will display an error message like this:
@@ -82,7 +82,7 @@ Exp:- sh ei-container.sh start 10|20
 
 Similarly, when stopping containers, the script will ensure that the number of containers provided is not greater than the number of currently running containers.
 
-### Example
+### Example ##
 Starting 3 containers with the default configuration:
 
 ```bash
@@ -100,6 +100,6 @@ Checking the status of containers:
 ```bash
 sh ei-container.sh status
 ```
-## Notes
+## Notes ##
 * The script dynamically assigns external ports starting from the base port 9000. Each new container will map the next available port, incrementing by 1.
 * Ensure you have sufficient resources to run the specified number of containers, especially when using a high number.
