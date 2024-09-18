@@ -9,17 +9,33 @@
 # INT_PORT >> port number of container
 # STOP_CONTAINER_NUMBER >> number of containers you wish to stop
 
+
 SERVICE_NAME="EI Utility Containers"
 BUILD_ARGS="-e CAF_SYSTEM_SERIAL_ID=FCW2610Y10Y  -e CAF_SYSTEM_PRODUCT_ID=IR1101-K9  -e CAF_APP_PERSISTENT_DISK_SIZE_KB=256000  -e CAF_APP_LOG_DIR=/data/logs"
 IMAGE_NAME="dockerhub-master.cisco.com/iot-darkphoenix-docker/ei-edge-testing:1.16.20"
 CONTAINER_NAME="ei-local-manager"
-EXT_PORT=8008
+EXT_PORT=9000
 INT_PORT=8008
+COMMAND=$1
 NUMBER_OF_CONTAINERS=$2
 
+
 CONTAINERS_RUNNING=`docker ps|grep -v NAME | awk '{print $NF}' | wc -l`
+NAME_OF_CONTAINERS_RUNNING=`docker ps|grep -v NAME | awk '{print $NF}' | awk -F '-' '{print $4}' | head -n1`
+
+if [ $CONTAINERS_RUNNING -eq $NAME_OF_CONTAINERS_RUNNING  ]; then
+     sleep 0
+else
+     CONTAINERS_RUNNING=$NAME_OF_CONTAINERS_RUNNING
+fi
 
 start_service() {
+
+     if [ -z $COMMAND ] || [ -z $NUMBER_OF_CONTAINERS ]; then
+       echo "========= Incomplete Arguments, Both arguments must be provided  ========="
+       echo "Exp:- sh ei-container.sh start 10|20"
+       exit 0
+    fi
 
     #Check if any containers are running
     echo "Numbers of $SERVICE_NAME already running : " $CONTAINERS_RUNNING
@@ -28,7 +44,7 @@ start_service() {
 	     START_CONTAINERS_COUNT=$((CONTAINERS_RUNNING + 1))
 	     echo " $CONTAINERS_RUNNING $SERVICE_NAME are already running.... , Creating new containers from $NEW_CONTAINERS"
     else
-	     echo "No $SERVICE_NAME found, starting $2 containers "
+	     echo "No $SERVICE_NAME found, starting $NUMBER_OF_CONTAINERS containers "
 	     START_CONTAINERS_COUNT=1
     fi
 
@@ -49,12 +65,19 @@ start_service() {
 
 stop_service() {
 
+    if [ -z $COMMAND ] || [ -z $NUMBER_OF_CONTAINERS ]; then
+       echo "========= Incomplete Arguments, Both arguments must be provided  ========="
+       echo "Exp:- sh ei-container.sh stop 10|20|all"
+       exit 0
+    fi
+
     if [ $NUMBER_OF_CONTAINERS == "all" ]; then
 	      NUMBER_OF_CONTAINERS=$CONTAINERS_RUNNING
 	      if  [ $NUMBER_OF_CONTAINERS -eq 0 ]; then
-                   echo "No $SERVICE_NAME are running"
+                  echo "No $SERVICE_NAME are running"
 	      fi
     fi
+
 
     COUNTNER=1
     if [ $NUMBER_OF_CONTAINERS -le $CONTAINERS_RUNNING ]; then
@@ -62,24 +85,27 @@ stop_service() {
 	        STOP_CONTAINER_NUMBER=$CONTAINERS_RUNNING
 	        while [ $COUNTNER -le $NUMBER_OF_CONTAINERS ]; do
 	             echo "stoping and removing $CONTAINER_NAME-$STOP_CONTAINER_NUMBER container....."
-		     docker stop $CONTAINER_NAME-$STOP_CONTAINER_NUMBER
+		     docker stop -t 0 $CONTAINER_NAME-$STOP_CONTAINER_NUMBER
 	             docker rm $CONTAINER_NAME-$STOP_CONTAINER_NUMBER | 2> /dev/null
 	             COUNTNER=$((COUNTNER + 1 ))
 		     STOP_CONTAINER_NUMBER=$((STOP_CONTAINER_NUMBER - 1))
+		     if [ $CONTAINERS_RUNNING -eq 0 ]; then
+			 exit 0
+		     fi
 	        done
     elif [ $CONTAINERS_RUNNING -eq 0 ]; then
-          echo "No $SERVICE_NAME are running"
+          echo "=============== No $SERVICE_NAME are running ==============="
     else
-	  echo "Number of $SERVICE_NAME running is less then $NUMBER_OF_CONTAINERS"
+          echo "=============== Only $CONTAINERS_RUNNING $SERVICE_NAME are running, pls provide value $CONTAINERS_RUNNING or less ==============="
     fi
 }
 
 status_service() {
-    echo "Checking status of $SERVICE_NAME..."
+    echo "Checking status of $SERVICE_NAME... "
     echo "$CONTAINERS_RUNNING $SERVICE_NAME are running...."
 }
 
-case "$1" in
+case "$COMMAND" in
     start)
 	start_service
         ;;
