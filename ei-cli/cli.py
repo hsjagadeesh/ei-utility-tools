@@ -5,6 +5,7 @@
 import sys
 import os
 import yaml
+import getpass
 
 import argparse
 import logging
@@ -84,10 +85,22 @@ def is_valid_string(string):
   return bool(string and string.strip())
 
 def on_cli_init(cli_args, parser):
-  print("on_cli_init", cli_args)
+  logger.debug("Calling on_cli_init()")
+  try:
+    status = init_ei_cli()
+    if status:
+      print("EI CLI env successfully initialized at '{}'".format(os.getenv(EI_CLI_HOME)))
+      logger.debug("EI CLI env initialization successful at EI_CLI_HOME : '{}'".format(os.getenv(EI_CLI_HOME)))
+    else:
+      print("Failed to initialize EI CLI env at '{}'".format(os.getenv(EI_CLI_HOME)))
+      logger.debug("EI CLI env initialization failed at EI_CLI_HOME : '{}'".format(os.getenv(EI_CLI_HOME)))
+  except Exception as ex:
+    logger.debug("EI CLI initialization failed :" + str(ex))
+    print("EI CLI initialization failed : " + str(ex))
 
 def on_pipeline_deploy(cli_args, parser):
   logger.debug("Calling on_pipeline_deploy()")
+  common_password = getpass.getpass('Enter the password:')
   inventory_file = cli_args.get("inventory_file", "")
   if is_valid_string(inventory_file):
     logger.debug("Pipeline deployment selected for " + inventory_file)
