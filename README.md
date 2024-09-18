@@ -10,29 +10,32 @@ TODO : Steps to use ei-cli tool
 
 ### EI Utility Containers Script
 
-**This script is used to manage Docker containers by providing options to start, stop, or check the status of running containers. It allows you to specify the number of containers to start or stop, and maps container ports dynamically based on user input.**
+*This script is used to manage Docker containers by providing options to start, stop, or check the status of running containers. It allows you to specify the number of containers to start or stop, and maps container ports dynamically based on user input.*
 
-# Features
+## Features
 * **Start Containers:** Start a specified number of containers using a custom image and environment variables.
 * **Stop Containers:** Stop a specified number of running containers or stop all of them.
 * **Check Status:** Display how many containers are currently running.
 * **Port Mapping:** Automatically map container ports starting from a base external port.
 
-# Prerequisites
-Docker installed and running.
-Sufficient resources (memory, CPU) to run multiple containers.
-Variables
-Variable Name	Description
-SERVICE_NAME	Descriptive name of the service (in this case, "Utility Containers").
-BUILD_ARGS	Arguments passed when creating containers, including environment variables.
-IMAGE_NAME	Docker image to use for creating containers (default: nginx).
-CONTAINER_NAME	Base name of containers (e.g., local-manager).
-EXT_PORT	Base external port for mapping container ports to host ports (default: 9000).
-INT_PORT	Internal port used within the containers (default: 8008).
-NUMBER_OF_CONTAINERS	Number of containers to start or stop.
-CONTAINERS_RUNNING	Number of containers that are currently running.
-NAME_OF_CONTAINERS_RUNNING	Retrieves the name of running containers.
-START_CONTAINERS_COUNT	Name counter for the containers, used to uniquely name them when creating.
+## Prerequisites
+* Docker installed and running.
+* Sufficient resources (memory, CPU) to run multiple containers.
+
+## Variables
+|Variable Name	|Description |
+|---------------|------------|
+|SERVICE_NAME	|Descriptive name of the service (in this case, "Utility Containers").
+|BUILD_ARGS	|Arguments passed when creating containers, including environment variables.
+|IMAGE_NAME	|Docker image to use for creating containers (default: nginx).
+|CONTAINER_NAME	|Base name of containers (e.g., local-manager).
+|EXT_PORT	|Base external port for mapping container ports to host ports (default: 9000).
+|INT_PORT	|Internal port used within the containers (default: 8008).
+|NUMBER_OF_CONTAINERS	|Number of containers to start or stop.
+|CONTAINERS_RUNNING	|Number of containers that are currently running.
+|NAME_OF_CONTAINERS_RUNNING	|Retrieves the name of running containers.
+|START_CONTAINERS_COUNT	|Name counter for the containers, used to uniquely name them when creating.
+
 Usage
 Start Containers
 To start a specified number of containers:
