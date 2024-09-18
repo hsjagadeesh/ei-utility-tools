@@ -5,11 +5,16 @@ import logging
 import sys
 import cli
 
-def get_config_dir():
+def get_log_file():
+  if os.getenv("EI_CLI_HOME") is None:
+    print("EI_CLI_HOME env variable is not set")
+    exit(0)
   _config_dir = os.getenv("EI_CLI_HOME", os.path.join(os.getenv("HOME"), ".ei"))
-  return _config_dir
+  return os.path.join(_config_dir, 'ei-cli.log')
 
-def configure_logging(log_path, level):
+def configure_logging(log_path=None, log_level=logging.DEBUG):
+  if log_path is None:
+    log_path = get_log_file()
   if not os.path.exists(os.path.dirname(log_path)):
     try:
       os.makedirs(os.path.dirname(log_path), exist_ok=True)
@@ -18,12 +23,10 @@ def configure_logging(log_path, level):
   elif (os.path.exists(log_path) and not os.access(log_path, os.W_OK)) or not os.access(os.path.dirname(log_path), os.W_OK):
     print("[WARNING]: log file at %s is not writeable and we cannot create it\n" % log_path, file=sys.stderr)
   else:
-    logging.basicConfig(filename=log_path, level=level, format='%(asctime)s %(name)s %(message)s')
+    logging.basicConfig(filename=log_path, level=log_level, format='%(asctime)s %(name)s %(message)s')
   os.environ['EI_LOG_PATH'] = log_path
 
-def get_log_file():
-  return os.path.join(get_config_dir(), 'ei.log')
-
-configure_logging(get_log_file(), logging.DEBUG)
-
+# Configure the log setting
+configure_logging(level=logging.DEBUG)
+# Entry point for ei-cli
 cli.main()
