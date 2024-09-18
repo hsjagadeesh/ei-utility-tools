@@ -27,6 +27,6 @@ def configure_logging(log_path=None, log_level=logging.DEBUG):
   os.environ['EI_LOG_PATH'] = log_path
 
 # Configure the log setting
-configure_logging(level=logging.DEBUG)
+configure_logging(log_level=logging.DEBUG)
 # Entry point for ei-cli
 cli.main()
