@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 
-"""Command Line Module for EI Data Pipeline Operations"""
-
-from __future__ import print_function
+"""Command Line Module for EI Local Manager Orchestration"""
 
 import sys
 import os
@@ -16,8 +14,9 @@ cwd = os.getcwd()
 def main():
 
   parser = argparse.ArgumentParser(description="EI Local Manager CLI Orchestrator (Version 1.0.0)")
-  # parser.add_argument('-v', '--verbosity', type=int, dest='verbosity', help='verbosity range [0-6]', default=2, required=False)
   command_parser = parser.add_subparsers(help="options", dest='command')
+  # CLI to initialize the ei-cli environment
+  init_parser = command_parser.add_parser('init', help='initialize ei-cli environment')
 
   # User related CLIs
   user_parser = command_parser.add_parser('user', help='user operations (change-password)')
@@ -49,28 +48,30 @@ def main():
   pipeline_status_parser = pipeline_command_parser.add_parser('status', help='get status of data pipeline(s)')
   pipeline_status_parser.add_argument('-f', '--file', type=str, dest='inventory_file', help='pipeline(s) inventory file (yaml)')
 
-  args = parser.parse_args()
-  logger.debug("EI CLI command running with args: %s", vars(args))
+  cli_args = parser.parse_args()
+  logger.debug("EI CLI command running with args: %s", vars(cli_args))
 
-  if args.command == 'pipeline':
-    if args.pipeline_command == 'deploy':
-      on_pipeline_deploy(vars(args), pipeline_deploy_parser)
-    elif args.pipeline_command == 'undeploy':
-      on_pipeline_undeploy(vars(args), pipeline_undeploy_parser)
-    elif args.pipeline_command == 'status':
-      on_pipeline_status(vars(args), pipeline_status_parser)
+  if cli_args.command == 'init':
+    on_cli_init(vars(cli_args), init_parser)
+  elif cli_args.command == 'pipeline':
+    if cli_args.pipeline_command == 'deploy':
+      on_pipeline_deploy(vars(cli_args), pipeline_deploy_parser)
+    elif cli_args.pipeline_command == 'undeploy':
+      on_pipeline_undeploy(vars(cli_args), pipeline_undeploy_parser)
+    elif cli_args.pipeline_command == 'status':
+      on_pipeline_status(vars(cli_args), pipeline_status_parser)
     else:
       parser.print_help()
-  elif args.command == 'agent':
-    if args.agent_command == 'reset':
-      on_agent_reset(vars(args), agent_reset_parser)
-    elif args.agent_command == 'status':
-      on_agent_status(vars(args), agent_status_parser)
+  elif cli_args.command == 'agent':
+    if cli_args.agent_command == 'reset':
+      on_agent_reset(vars(cli_args), agent_reset_parser)
+    elif cli_args.agent_command == 'status':
+      on_agent_status(vars(cli_args), agent_status_parser)
     else:
       parser.print_help()
-  elif args.command == 'user':
-    if args.user_command == 'change-pwd':
-      on_user_change_pwd(vars(args), user_change_pwd_parser)
+  elif cli_args.command == 'user':
+    if cli_args.user_command == 'change-pwd':
+      on_user_change_pwd(vars(cli_args), user_change_pwd_parser)
     else:
       parser.print_help()
   else:
@@ -79,9 +80,12 @@ def main():
 def is_valid_string(string):
   return bool(string and string.strip())
 
-def on_pipeline_deploy(args, parser):
+def on_cli_init(cli_args, parser):
+  print("on_cli_init", cli_args)
+
+def on_pipeline_deploy(cli_args, parser):
   logger.debug("Calling on_pipeline_deploy()")
-  inventory_file = args.get("inventory_file", "")
+  inventory_file = cli_args.get("inventory_file", "")
   if is_valid_string(inventory_file):
     logger.debug("Pipeline deployment selected", inventory_file)
   else:
@@ -89,25 +93,24 @@ def on_pipeline_deploy(args, parser):
     logger.error("Invalid : pipeline inventory file options :" + str(inventory_file))
     parser.print_help()
 
-def on_pipeline_undeploy(args, parser):
-  print("on_pipeline_undeploy", args)
+def on_pipeline_undeploy(cli_args, parser):
+  print("on_pipeline_undeploy", cli_args)
 
-def on_pipeline_status(args, parser):
-  print("on_pipeline_status", args)
+def on_pipeline_status(cli_args, parser):
+  print("on_pipeline_status", cli_args)
 
-def on_agent_status(args, parser):
-  print("on_agent_status", args)
+def on_agent_status(cli_args, parser):
+  print("on_agent_status", cli_args)
 
-def on_agent_reset(args, parser):
-  print("on_agent_reset", args)
+def on_agent_reset(cli_args, parser):
+  print("on_agent_reset", cli_args)
 
-def on_user_change_pwd(args, parser):
-  print("on_user_change_pwd", args)
+def on_user_change_pwd(cli_args, parser):
+  print("on_user_change_pwd", cli_args)
 
 if __name__ == '__main__':
     p = argparse.ArgumentParser(description='...')
     p.add_argument('--argument', required=False)
-    p.add_argument('-a', required='--argument' in sys.argv) #only required if --argument is given
-    p.add_argument('-b', required='--argument' in sys.argv) #only required if --argument is given
-    args = p.parse_args()
-    print(args)
+    p.add_argument('-a', required='--argument' in sys.argv)  # only required if --argument is given
+    p.add_argument('-b', required='--argument' in sys.argv)  # only required if --argument is given
+    print(p.parse_args())

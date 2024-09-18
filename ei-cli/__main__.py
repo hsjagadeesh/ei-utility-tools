@@ -6,7 +6,7 @@ import sys
 import cli
 
 def get_config_dir():
-  _config_dir = os.getenv("EI_WORKSPACE", os.path.join(os.getenv("HOME"), ".ei"))
+  _config_dir = os.getenv("EI_CLI_HOME", os.path.join(os.getenv("HOME"), ".ei"))
   return _config_dir
 
 def configure_logging(log_path, level):
