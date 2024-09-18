@@ -38,10 +38,10 @@ TODO : Steps to use ei-cli tool
 
 ## Usage
 # Start Containers #
-*To start a specified number of containers:
+* To start a specified number of containers:
 
 ```bash
-* sh ei-container.sh start <number_of_containers>
+sh ei-container.sh start <number_of_containers>
 ```
 For example, to start 5 containers:
 ```bash
@@ -62,7 +62,7 @@ sh ei-container.sh stop 3
 * To stop all running containers:
 
 ```bash
-* sh ei-container.sh stop all
+sh ei-container.sh stop all
 ```
 ## Check Status ##
 * To check the status of running containers:
