@@ -1,0 +1,4 @@
+{
+    "INVOKE_INTERVAL": 1000,
+    "MQTT_QOS": 1
+}
