@@ -12,7 +12,6 @@ import logging
 import ei_lm
 
 logger = logging.getLogger(__name__)
-cwd = os.getcwd()
 CONFIG_DIR = "configs"
 EI_CLI_HOME = "EI_CLI_HOME"
 
@@ -162,8 +161,6 @@ def on_agent_reset(cli_args, parser):
 
 def on_user_change_pwd(cli_args, parser):
   print("on_user_change_pwd", cli_args)
-
-
 
 def load_inventory(file_name):
   # Check EI_CLI_HOME env is set or not
