@@ -38,7 +38,7 @@ TODO : Steps to use ei-cli tool
 
 ## Usage
 # Start Containers #
-* To start a specified number of containers:
+*To start a specified number of containers:
 
 ```bash
 * sh ei-container.sh start <number_of_containers>
