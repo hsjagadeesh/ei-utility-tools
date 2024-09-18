@@ -36,14 +36,14 @@ TODO : Steps to use ei-cli tool
 |NAME_OF_CONTAINERS_RUNNING	|Retrieves the name of running containers.
 |START_CONTAINERS_COUNT	|Name counter for the containers, used to uniquely name them when creating.
 
-Usage
-Start Containers
-To start a specified number of containers:
+## Usage
+# Start Containers
+* To start a specified number of containers:
 
-bash
-Copy code
+```bash
 sh ei-container.sh start <number_of_containers>
-For example, to start 5 containers:
+
+###For example, to start 5 containers:
 
 bash
 Copy code
