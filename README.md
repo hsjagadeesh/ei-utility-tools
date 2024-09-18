@@ -10,7 +10,7 @@ TODO : Steps to use ei-cli tool
 
 ### EI Utility Containers Script
 
-**This script is used to manage Docker containers by providing options to start, stop, or check the status of running containers. It allows you to specify the number of containers to start or stop, and maps container ports dynamically based on user input.
+**This script is used to manage Docker containers by providing options to start, stop, or check the status of running containers. It allows you to specify the number of containers to start or stop, and maps container ports dynamically based on user input.**
 
 # Features
 * **Start Containers:** Start a specified number of containers using a custom image and environment variables.
