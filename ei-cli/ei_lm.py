@@ -1,6 +1,7 @@
 from threading import Thread
 import logging
 import os
+import time
 
 MAX_BATCH_SIZE = os.getenv("EI_CLI_BATCH_SIZE", 20)
 DEPLOY = "deploy"
@@ -167,11 +168,11 @@ def un_deploy_pipeline(pipeline_obj):
   logger.debug("Started un-deploying pipeline " + pipeline_name + " on device " + device_ip)
   print("Started un-deploying pipeline", pipeline_name, "on device", device_ip)
   # TODO Send http delete request to the device. URL: /api/v1/edge-intelligence/pipelines/{pipelineId}
-
+  time.sleep(2)
   # Set the response from the api call to pipeline object
   status = pipeline_obj[RESPONSE] = "Success"
   print("Finished un-deploying pipeline", pipeline_name, "on device", device_ip, "Status:", status)
-  logger.debug("Finished un-deploying pipeline " + pipeline_name + " on device " + device_ip + "Status: " + status)
+  logger.debug("Finished un-deploying pipeline " + pipeline_name + " on device " + device_ip + " Status: " + status)
   pass
 
 def get_pipeline_status(pipeline_obj):
@@ -180,11 +181,11 @@ def get_pipeline_status(pipeline_obj):
   logger.debug("Started getting pipeline status for " + pipeline_name + " on device " + device_ip)
   print("Started getting pipeline status for", pipeline_name, "on device", device_ip)
   # TODO Send http get status request to the device. URL: /api/v1/edge-intelligence/pipelines/{pipelineId}/status
-
+  time.sleep(2)
   # Set the response from the api call to pipeline object
   status = pipeline_obj[RESPONSE] = "Success"
   print("Finished getting pipeline status for", pipeline_name, "on device", device_ip, "Status:", status)
-  logger.debug("Finished getting pipeline status for " + pipeline_name + " on device " + device_ip + "Status: " + status)
+  logger.debug("Finished getting pipeline status for " + pipeline_name + " on device " + device_ip + " Status: " + status)
   pass
 
 def deploy_pipeline(pipeline_obj):
@@ -193,9 +194,9 @@ def deploy_pipeline(pipeline_obj):
   logger.debug("Started deploying pipeline " + pipeline_name + " on device " + device_ip)
   print("Started deploying pipeline", pipeline_name, "on device", device_ip)
   # TODO Send http post request to the device. URL: /edge-intelligence/pipelines
-
+  time.sleep(2)
   # Set the response from the api call to pipeline object
   status = pipeline_obj[RESPONSE] = "Success"
   print("Finished deploying pipeline", pipeline_name, "on device", device_ip, "Status:", status)
-  logger.debug("Finished deploying pipeline " + pipeline_name + " on device " + device_ip + "Status: " + status)
+  logger.debug("Finished deploying pipeline " + pipeline_name + " on device " + device_ip + " Status: " + status)
   pass
