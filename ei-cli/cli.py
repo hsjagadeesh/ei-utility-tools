@@ -10,6 +10,7 @@ import getpass
 import argparse
 import logging
 import ei_lm
+import traceback
 
 logger = logging.getLogger(__name__)
 CONFIG_DIR = "configs"
@@ -107,15 +108,16 @@ def init_ei_cli():
 
 def on_pipeline_deploy(cli_args, parser):
   logger.debug("Calling on_pipeline_deploy()")
-  common_password = getpass.getpass('Enter the password:')
   inventory_file = cli_args.get("inventory_file", "")
   if is_valid_string(inventory_file):
+    common_password = getpass.getpass('Enter the password:')
     logger.debug("Pipeline deploy selected for " + inventory_file)
     try:
       inventory_data = load_inventory(file_name=inventory_file)
       ei_lm.execute_pipelines(inventory_data, device_pwd=common_password, operation=ei_lm.DEPLOY)
     except Exception as ex:
-      print(ex)
+      print(traceback.format_exc())
+      logger.error(traceback.format_exc())
   else:
     print("\nPlease provide a valid pipeline inventory file option\n")
     logger.error("Invalid : pipeline inventory file options :" + str(inventory_file))

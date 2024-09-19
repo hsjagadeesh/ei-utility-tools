@@ -43,7 +43,6 @@ class EiCliThread(Thread):
     return self.ret
 
 def run_in_batch(task_threads, max_thread_spawns_allowed=MAX_BATCH_SIZE):
-  max_thread_spawns_allowed = MAX_BATCH_SIZE
   # calculate no of batches of threads to be spawned
   if len(task_threads) > max_thread_spawns_allowed:
     if len(task_threads) % max_thread_spawns_allowed:
@@ -52,7 +51,7 @@ def run_in_batch(task_threads, max_thread_spawns_allowed=MAX_BATCH_SIZE):
       no_of_batches = int(len(task_threads) / max_thread_spawns_allowed)
   else:
     no_of_batches = 1
-  print("No of batches of threads to run {}".format(no_of_batches))
+  logger.debug("No of batches of threads to run {}".format(no_of_batches))
   i = 0
   for batch in range(no_of_batches):
     # for each batch, start the threads and wait for those to complete
@@ -69,6 +68,7 @@ def run_in_batch(task_threads, max_thread_spawns_allowed=MAX_BATCH_SIZE):
 
 def execute_pipelines(inventory_list, device_pwd=None, operation=None):
   pipeline_obj_list = []
+  logger.debug("Number of objects inventory file " + str(len(inventory_list)))
   print(inventory_list)
 
   # Create pipeline object list from inventory list
@@ -82,15 +82,16 @@ def execute_pipelines(inventory_list, device_pwd=None, operation=None):
   if len(pipeline_obj_list) > 0:
     for pipeline_obj in pipeline_obj_list:
       if pipeline_obj is not None:
-        t = EiCliThread(target=execute_pipeline_obj, args=pipeline_obj)
+        t = EiCliThread(target=execute_pipeline_obj, args=(operation, pipeline_obj))
         ei_cli_threads.append(t)
-
   # Start the thread execution in batches
   if len(ei_cli_threads) > 0:
     run_in_batch(ei_cli_threads, MAX_BATCH_SIZE)
 
-def execute_pipeline_obj(pipeline_obj):
-  operation = pipeline_obj[OPERATION]
+def execute_pipeline_obj(operation=None, pipeline_obj=None):
+  if operation is None:
+    operation = pipeline_obj[OPERATION]
+  # Check operation and perform the task
   if operation == DEPLOY:
     deploy_pipeline(pipeline_obj)
   elif operation == UN_DEPLOY:
@@ -124,11 +125,11 @@ def get_pipeline_obj(inventory_obj, operation=None):
   # This field will contain the response of the api call and will get updated during api call execution
   pipeline_obj[RESPONSE] = "NA"
   pipeline_obj[OPERATION] = operation
+  pipeline_obj[DEVICE_IP] = device_ip
+  pipeline_obj[PIPELINE_NAME] = pipeline_name
 
   # If the operation is un-deploy or get status, then only device ip and pipeline name is needed
   if operation == STATUS or operation == UN_DEPLOY:
-    pipeline_obj[DEVICE_IP] = device_ip
-    pipeline_obj[PIPELINE_NAME] = pipeline_name
     return pipeline_obj
 
   if operation == DEPLOY:
@@ -161,22 +162,40 @@ def get_pipeline_json(data_source_json, data_target_json, data_logic_json=None, 
   return pipeline_json
 
 def un_deploy_pipeline(pipeline_obj):
+  device_ip = pipeline_obj[DEVICE_IP]
+  pipeline_name = pipeline_obj[PIPELINE_NAME]
+  logger.debug("Started un-deploying pipeline " + pipeline_name + " on device " + device_ip)
+  print("Started un-deploying pipeline", pipeline_name, "on device", device_ip)
   # TODO Send http delete request to the device. URL: /api/v1/edge-intelligence/pipelines/{pipelineId}
 
   # Set the response from the api call to pipeline object
-  pipeline_obj[RESPONSE] = "Success"
+  status = pipeline_obj[RESPONSE] = "Success"
+  print("Finished un-deploying pipeline", pipeline_name, "on device", device_ip, "Status:", status)
+  logger.debug("Finished un-deploying pipeline " + pipeline_name + " on device " + device_ip + "Status: " + status)
   pass
 
 def get_pipeline_status(pipeline_obj):
+  device_ip = pipeline_obj[DEVICE_IP]
+  pipeline_name = pipeline_obj[PIPELINE_NAME]
+  logger.debug("Started getting pipeline status for " + pipeline_name + " on device " + device_ip)
+  print("Started getting pipeline status for", pipeline_name, "on device", device_ip)
   # TODO Send http get status request to the device. URL: /api/v1/edge-intelligence/pipelines/{pipelineId}/status
 
   # Set the response from the api call to pipeline object
-  pipeline_obj[RESPONSE] = "Success"
+  status = pipeline_obj[RESPONSE] = "Success"
+  print("Finished getting pipeline status for", pipeline_name, "on device", device_ip, "Status:", status)
+  logger.debug("Finished getting pipeline status for " + pipeline_name + " on device " + device_ip + "Status: " + status)
   pass
 
 def deploy_pipeline(pipeline_obj):
+  device_ip = pipeline_obj[DEVICE_IP]
+  pipeline_name = pipeline_obj[PIPELINE_NAME]
+  logger.debug("Started deploying pipeline " + pipeline_name + " on device " + device_ip)
+  print("Started deploying pipeline", pipeline_name, "on device", device_ip)
   # TODO Send http post request to the device. URL: /edge-intelligence/pipelines
 
   # Set the response from the api call to pipeline object
-  pipeline_obj[RESPONSE] = "Success"
+  status = pipeline_obj[RESPONSE] = "Success"
+  print("Finished deploying pipeline", pipeline_name, "on device", device_ip, "Status:", status)
+  logger.debug("Finished deploying pipeline " + pipeline_name + " on device " + device_ip + "Status: " + status)
   pass
