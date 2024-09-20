@@ -10,6 +10,7 @@
 # STOP_CONTAINER_NUMBER >> number of containers you wish to stop
 
 
+
 SERVICE_NAME="EI Utility Containers"
 BUILD_ARGS="-e CAF_SYSTEM_SERIAL_ID=FCW2610Y10Y  -e CAF_SYSTEM_PRODUCT_ID=IR1101-K9  -e CAF_APP_PERSISTENT_DISK_SIZE_KB=256000  -e CAF_APP_LOG_DIR=/data/logs"
 IMAGE_NAME="dockerhub-master.cisco.com/iot-darkphoenix-docker/ei-edge-testing:1.16.20"
@@ -19,6 +20,15 @@ INT_PORT=8008
 COMMAND=$1
 NUMBER_OF_CONTAINERS=$2
 
+HOST_IP=10.105.58.119
+PIPELINE_NAME=pipeline
+PIPELINE_NUMBER=1
+DATA_SOURCE_FILE=data_source_1.json
+DATA_LOGIC_FILE=data_logic_1.json
+DATA_TARGET_FILE=data_target_1.json
+DATA_VARIABLES_FILE=data_vars_1.json
+
+OUTPUT_FILE="inventory.yml"
 
 CONTAINERS_RUNNING=`docker ps|grep -v NAME | awk '{print $NF}' | wc -l`
 NAME_OF_CONTAINERS_RUNNING=`docker ps|grep -v NAME | awk '{print $NF}' | awk -F '-' '{print $4}' | head -n1`
@@ -58,7 +68,16 @@ start_service() {
     do
        echo "start container $CONTAINER_NAME-$CONTAINER_NUMBER"
        docker run -dit $BUILD_ARGS -p $EXT_PORT:$INT_PORT --name $CONTAINER_NAME-$CONTAINER_NUMBER $IMAGE_NAME
+       cat <<EOL >> $OUTPUT_FILE
+- DEVICE_IP: ${HOST_IP}:${EXT_PORT}
+  PIPELINE_NAME: $PIPELINE_NAME$PIPELINE_NUMBER
+  DATA_SOURCE_FILE: ${DATA_SOURCE_FILE}
+  DATA_LOGIC_FILE: ${DATA_LOGIC_FILE}
+  DATA_TARGET_FILE: ${DATA_TARGET_FILE}
+  DATA_VARIABLES_FILE: ${DATA_VARIABLES_FILE}
+EOL
        EXT_PORT=$((EXT_PORT + 1))
+       PIPELINE_NUMBER=$((PIPELINE_NUMBER + 1))
        CONTAINER_NUMBER=$((CONTAINER_NUMBER + 1 ))
      done
 }
@@ -73,6 +92,7 @@ stop_service() {
 
     if [ $NUMBER_OF_CONTAINERS == "all" ]; then
 	      NUMBER_OF_CONTAINERS=$CONTAINERS_RUNNING
+	      rm -rf inventory.yml
 	      if  [ $NUMBER_OF_CONTAINERS -eq 0 ]; then
                   echo "No $SERVICE_NAME are running"
 	      fi
@@ -87,6 +107,7 @@ stop_service() {
 	             echo "stoping and removing $CONTAINER_NAME-$STOP_CONTAINER_NUMBER container....."
 		     docker stop -t 0 $CONTAINER_NAME-$STOP_CONTAINER_NUMBER
 	             docker rm $CONTAINER_NAME-$STOP_CONTAINER_NUMBER | 2> /dev/null
+		     sed -i "/${HOST_IP}:$((EXT_PORT + STOP_CONTAINER_NUMBER))/,+5d" inventory.yml
 	             COUNTNER=$((COUNTNER + 1 ))
 		     STOP_CONTAINER_NUMBER=$((STOP_CONTAINER_NUMBER - 1))
 		     if [ $CONTAINERS_RUNNING -eq 0 ]; then
