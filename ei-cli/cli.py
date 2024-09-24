@@ -15,10 +15,11 @@ import traceback
 logger = logging.getLogger(__name__)
 CONFIG_DIR = "configs"
 EI_CLI_HOME = "EI_CLI_HOME"
+VERSION = "1.0.0"
 
 def main():
 
-  parser = argparse.ArgumentParser(description="EI Local Manager CLI Orchestrator (Version 1.0.0)")
+  parser = argparse.ArgumentParser(description="EI Local Manager CLI Orchestrator [Version " + VERSION + "]")
   command_parser = parser.add_subparsers(help="options", dest='command')
   # CLI to initialize the ei-cli environment
   init_parser = command_parser.add_parser('init', help='initialize ei-cli environment')
