@@ -2,7 +2,7 @@
 
 This repo contains tools related to EI Local Manager 
 
-## EI CLI (ei-cli)
+## EI CLI Tool (ei-cli)
 
 To build the package
 ```bash
