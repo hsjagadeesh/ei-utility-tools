@@ -1,0 +1,5 @@
+include version.py
+include ei_cli/*.txt
+include ei_cli/configs/sample/*.json
+exclude ei_cli/configs/test_*
+exclude scripts/*

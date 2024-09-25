@@ -41,34 +41,34 @@ TODO : Steps to use ei-cli tool
 * To start a specified number of containers:
 
 ```bash
-sh ei-container.sh start <number_of_containers>
+sh ei-scale-utility.sh start <number_of_containers>
 ```
 For example, to start 5 containers:
 ```bash
-sh ei-container.sh start 5
+sh ei-scale-utility.sh start 5
 ```
 ## Stop Containers ##
 
 * To stop a specified number of containers:
 
 ```bash
-sh ei-container.sh stop <number_of_containers>
+sh ei-scale-utility.sh stop <number_of_containers>
 ```
 * For example, to stop 3 containers:
 
 ```bash
-sh ei-container.sh stop 3
+sh ei-scale-utility.sh stop 3
 ```
 * To stop all running containers:
 
 ```bash
-sh ei-container.sh stop all
+sh ei-scale-utility.sh stop all
 ```
 ## Check Status ##
 * To check the status of running containers:
 
 ```bash
-sh ei-container.sh status
+sh ei-scale-utility.sh status
 ```
 ## This will display the number of containers currently running. ##
 
@@ -77,7 +77,7 @@ If the required arguments are not provided for the start or stop commands, the s
 
 ```bash
 ========= Incomplete Arguments, Both arguments must be provided  =========
-Exp:- sh ei-container.sh start 10|20
+Exp:- sh ei-scale-utility.sh start 10|20
 ```
 
 Similarly, when stopping containers, the script will ensure that the number of containers provided is not greater than the number of currently running containers.
@@ -86,19 +86,19 @@ Similarly, when stopping containers, the script will ensure that the number of c
 Starting 3 containers with the default configuration:
 
 ```bash
-sh ei-container.sh start 3
+sh ei-scale-utility.sh start 3
 ```
 
 Stopping 2 containers:
 
 ```bash
-sh ei-container.sh stop 2
+sh ei-scale-utility.sh stop 2
 ```
 
 Checking the status of containers:
 
 ```bash
-sh ei-container.sh status
+sh ei-scale-utility.sh status
 ```
 ## Notes ##
 * The script dynamically assigns external ports starting from the base port 9000. Each new container will map the next available port, incrementing by 1.

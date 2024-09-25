@@ -6,16 +6,16 @@ import sys
 import os
 import yaml
 import getpass
-
 import argparse
 import logging
-import ei_cli.ei_lm
 import traceback
+
+import ei_cli.ei_lm
+from ei_cli.version import VERSION
 
 logger = logging.getLogger(__name__)
 CONFIG_DIR = "configs"
 EI_CLI_HOME = "EI_CLI_HOME"
-VERSION = "1.0.0"
 
 def main():
 

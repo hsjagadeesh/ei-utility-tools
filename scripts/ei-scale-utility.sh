@@ -1,15 +1,13 @@
 #!/bin/bash
 
 # This utility is to start and stop and check the status of the running containers
-# you can start as many containes you want to start or stop
+# You can start as many containers you want to start or stop
 # NUMBER_OF_CONTAINERS >> number of containers you wish to start
 # CONTAINERS_RUNNING >> already running containers
 # START_CONTAINERS_COUNT >> name counter for container name like ei-local-manager-1, ei-local-manager-2 .... etc
 # EXT_PORT >> port number mapped with host from container port
 # INT_PORT >> port number of container
 # STOP_CONTAINER_NUMBER >> number of containers you wish to stop
-
-
 
 SERVICE_NAME="EI Utility Containers"
 BUILD_ARGS="-e CAF_SYSTEM_SERIAL_ID=FCW2610Y10Y  -e CAF_SYSTEM_PRODUCT_ID=IR1101-K9  -e CAF_APP_PERSISTENT_DISK_SIZE_KB=256000  -e CAF_APP_LOG_DIR=/data/logs"
@@ -97,7 +95,6 @@ stop_service() {
                   echo "No $SERVICE_NAME are running"
 	      fi
     fi
-
 
     COUNTNER=1
     if [ $NUMBER_OF_CONTAINERS -le $CONTAINERS_RUNNING ]; then
