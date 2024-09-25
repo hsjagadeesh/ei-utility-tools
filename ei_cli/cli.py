@@ -9,7 +9,7 @@ import getpass
 
 import argparse
 import logging
-import ei_lm
+import ei_cli.ei_lm
 import traceback
 
 logger = logging.getLogger(__name__)
