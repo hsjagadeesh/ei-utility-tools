@@ -4,6 +4,18 @@ This repo contains tools related to EI Local Manager
 
 ## EI CLI (ei-cli)
 
+To build the package
+```bash
+cd ei-utility-tools
+python3 setup.py sdist bdist_wheel
+```
+
+To install the package
+```bash
+cd ei-utility-tools/dist
+pip install ei-cli-1.0.0.tar.gz
+```
+
 TODO : Steps to use ei-cli tool
 
 ## EI Scale Utility Script (ei-scale-utility.sh)
