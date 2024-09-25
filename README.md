@@ -2,7 +2,7 @@
 
 This repo contains tools related to EI Local Manager 
 
-## EI-CLI
+## EI CLI (ei-cli)
 
 TODO : Steps to use ei-cli tool
 
