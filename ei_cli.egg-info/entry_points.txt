@@ -1,0 +1,3 @@
+[console_scripts]
+ei-cli = ei_cli.cli:main
+
