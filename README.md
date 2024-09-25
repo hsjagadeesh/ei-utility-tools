@@ -6,11 +6,11 @@ This repo contains tools related to EI Local Manager
 
 TODO : Steps to use ei-cli tool
 
-## Scale Infrastructure
+## Scripts
 
-### EI Utility Containers Script
+### EI Scale Utility Script
 
-*This script is used to manage Docker containers by providing options to start, stop, or check the status of running EI Utility Containers. It allows you to specify the number of containers to start or stop, and maps container ports dynamically based on user input.*
+*This script is used to manage docker containers by providing options to start, stop or check the status of running EI Utility Containers. It allows you to specify the number of containers to start or stop and maps container ports dynamically based on user input.*
 
 ## Features
 * **Start Containers:** Start a specified number of containers using a custom image and environment variables.
