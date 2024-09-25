@@ -52,10 +52,10 @@ sh ei-scale-utility.sh start 5
 ```bash
 sh ei-scale-utility.sh stop <number_of_containers>
 ```
-* For example, to stop 3 containers:
+* For example, to stop 5 containers:
 
 ```bash
-sh ei-scale-utility.sh stop 3
+sh ei-scale-utility.sh stop 5
 ```
 * To stop all running containers:
 
@@ -68,7 +68,7 @@ sh ei-scale-utility.sh stop all
 ```bash
 sh ei-scale-utility.sh status
 ```
-#### This will display the number of containers currently running.
+This will display the number of containers currently running.
 
 #### Error Handling
 If the required arguments are not provided for the start or stop commands, the script will display an error message like this:
