@@ -2,7 +2,10 @@ from threading import Thread
 import logging
 import os
 import time
+import json
 
+CONFIG_DIR = "configs"
+EI_CLI_HOME = "EI_CLI_HOME"
 MAX_BATCH_SIZE = os.getenv("EI_CLI_BATCH_SIZE", 20)
 DEPLOY = "deploy"
 UN_DEPLOY = "undeploy"
@@ -16,6 +19,10 @@ DATA_SOURCE_FILE = "DATA_SOURCE_FILE"
 DATA_TARGET_FILE = "DATA_TARGET_FILE"
 DATA_LOGIC_FILE = "DATA_LOGIC_FILE"
 DATA_VARIABLES_FILE = "DATA_VARIABLES_FILE"
+DATA_SOURCE_KEY = "dataSources"
+DATA_TARGET_KEY = "dataTarget"
+DATA_LOGIC_KEY = "scriptedDataLogic"
+DATA_OUTPUT_MODEL_KEY = "outputModel"
 
 PIPELINE_JSON = "PIPELINE_JSON"
 RESPONSE = "RESPONSE"
@@ -157,9 +164,28 @@ def get_pipeline_obj(inventory_obj, operation=None):
 
   return pipeline_obj
 
-def get_pipeline_json(data_source_json, data_target_json, data_logic_json=None, data_vars=None):
-  pipeline_json = {}
-  # TODO Combine the files and apply template variables
+def read_json_file(file_name):
+  data = None
+  if file_name is None:
+    return data
+  file_path = os.path.join(os.getenv(EI_CLI_HOME), CONFIG_DIR, file_name)
+  with open(file_path, 'r') as file:
+    data = json.load(file)
+  return data
+
+def get_pipeline_json(data_source_file, data_target_file, data_logic_file=None, data_vars_file=None):
+  pipeline_json = dict()
+  data_source_json = read_json_file(data_source_file)
+  data_target_json = read_json_file(data_target_file)
+  data_logic_json = read_json_file(data_logic_file)
+  data_vars_json = read_json_file(data_vars_file)
+  pipeline_json[DATA_SOURCE_KEY] = data_source_json[DATA_SOURCE_KEY]
+  pipeline_json[DATA_TARGET_KEY] = data_target_json[DATA_TARGET_KEY]
+  if DATA_OUTPUT_MODEL_KEY in data_target_json:
+    pipeline_json[DATA_OUTPUT_MODEL_KEY] = data_target_json[DATA_OUTPUT_MODEL_KEY]
+  if data_logic_json is not None:
+    pipeline_json[DATA_LOGIC_KEY] = data_logic_json[DATA_LOGIC_KEY]
+  # TODO Apply template variables
   return pipeline_json
 
 def un_deploy_pipeline(pipeline_obj):
@@ -200,3 +226,11 @@ def deploy_pipeline(pipeline_obj):
   print("Finished deploying pipeline", pipeline_name, "on device", device_ip, "Status:", status)
   logger.debug("Finished deploying pipeline " + pipeline_name + " on device " + device_ip + " Status: " + status)
   pass
+
+if __name__ == '__main__':
+  source_file = "data_source_1.json"
+  target_file = "data_target_1.json"
+  logic_file = "data_logic_1.json"
+  vars_file = "data_vars_1.json"
+  pipe_line_json = get_pipeline_json(source_file, target_file, logic_file, vars_file)
+  print(pipe_line_json)
