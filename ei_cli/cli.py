@@ -9,12 +9,14 @@ import getpass
 import argparse
 import logging
 import traceback
+import shutil
 
 import ei_cli.ei_lm
 from ei_cli.version import VERSION
 
 logger = logging.getLogger(__name__)
 CONFIG_DIR = "configs"
+SAMPLE_DIR = "sample"
 EI_CLI_HOME = "EI_CLI_HOME"
 
 def main():
@@ -104,7 +106,13 @@ def init_ei_cli():
   # Check EI_CLI_HOME env is set or not
   if os.getenv(EI_CLI_HOME) is None:
     raise Exception("EI_CLI_HOME env variable is not set")
-  # TODO Create a folder called "configs" under EI_CLI_HOME directory and copy the sample configs folder
+  dest_config_dir = os.path.join(os.getenv(EI_CLI_HOME), CONFIG_DIR, SAMPLE_DIR)
+  src_config_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), CONFIG_DIR, SAMPLE_DIR)
+  if not os.path.exists(dest_config_dir):
+    os.makedirs(dest_config_dir)
+  # print("Copying sample configs files from " + src_config_dir + " to " + dest_config_dir)
+  logger.debug("Copying sample configs files from " + src_config_dir + " to " + dest_config_dir)
+  shutil.copytree(src_config_dir, dest_config_dir, dirs_exist_ok=True)
   return True
 
 def on_pipeline_deploy(cli_args, parser):
