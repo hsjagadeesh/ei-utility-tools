@@ -102,6 +102,15 @@ def on_cli_init(cli_args, parser):
     logger.debug("EI CLI initialization failed :" + str(ex))
     print("EI CLI initialization failed : " + str(ex))
 
+def copytree(src, dst, symlinks=False, ignore=None):
+  for item in os.listdir(src):
+    s = os.path.join(src, item)
+    d = os.path.join(dst, item)
+    if os.path.isdir(s):
+      shutil.copytree(s, d, symlinks, ignore)
+    else:
+      shutil.copy2(s, d)
+
 def init_ei_cli():
   # Check EI_CLI_HOME env is set or not
   if os.getenv(EI_CLI_HOME) is None:
@@ -112,7 +121,8 @@ def init_ei_cli():
     os.makedirs(dest_config_dir)
   # print("Copying sample configs files from " + src_config_dir + " to " + dest_config_dir)
   logger.debug("Copying sample configs files from " + src_config_dir + " to " + dest_config_dir)
-  shutil.copytree(src_config_dir, dest_config_dir, dirs_exist_ok=True)
+  # shutil.copytree(src_config_dir, dest_config_dir, dirs_exist_ok=True)  # This works with python 3.8 and above
+  copytree(src_config_dir, dest_config_dir)
   return True
 
 def on_pipeline_deploy(cli_args, parser):
