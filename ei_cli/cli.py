@@ -2,19 +2,20 @@
 
 """Command Line Module for EI Local Manager Orchestration"""
 
-import sys
-import os
-import yaml
-import getpass
 import argparse
+import getpass
 import logging
-import traceback
+import os
 import shutil
+import sys
+import traceback
+import yaml
 
-import ei_cli.ei_lm
+from ei_cli import ei_lm
 from ei_cli.version import VERSION
-# import ei_lm
-# from version import VERSION
+
+#import ei_lm
+#from version import VERSION
 
 logger = logging.getLogger(__name__)
 CONFIG_DIR = "configs"

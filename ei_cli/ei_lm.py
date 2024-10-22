@@ -80,7 +80,7 @@ def run_in_batch(task_threads, max_thread_spawns_allowed=MAX_BATCH_SIZE):
       task_threads[k].join()
     i = i + max_thread_spawns_allowed
 
-def execute_pipelines(inventory_list, device_pwd=None, operation=None, new_password=None):
+def execute_pipelines(inventory_list, operation=None, device_pwd=None,  new_password=None):
   pipeline_obj_list = []
   logger.debug("Number of objects inventory file " + str(len(inventory_list)))
   print(inventory_list)
