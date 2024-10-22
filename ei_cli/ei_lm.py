@@ -1,8 +1,12 @@
 from threading import Thread
-import logging
 import os
 import time
+from datetime import datetime
 import json
+
+import logging
+from logging import FileHandler
+from logging import Formatter
 
 CONFIG_DIR = "configs"
 EI_CLI_HOME = "EI_CLI_HOME"
@@ -29,6 +33,7 @@ RESPONSE = "RESPONSE"
 PASSWORD = "PASSWORD"
 NEW_PASSWORD = "NEW_PASSWORD"
 OPERATION = "OPERATION"
+LOGGER = "LOGGER"
 
 logger = logging.getLogger(__name__)
 
@@ -79,12 +84,14 @@ def execute_pipelines(inventory_list, device_pwd=None, operation=None, new_passw
   pipeline_obj_list = []
   logger.debug("Number of objects inventory file " + str(len(inventory_list)))
   print(inventory_list)
+  device_logger = get_device_logger(operation)
 
   # Create pipeline object list from inventory list
   for inventory_obj in inventory_list:
     pipeline_obj = get_pipeline_obj(inventory_obj, operation)
     pipeline_obj[PASSWORD] = device_pwd
     pipeline_obj[NEW_PASSWORD] = new_password
+    pipeline_obj[LOGGER] = device_logger
     pipeline_obj_list.append(pipeline_obj)
 
   # Create the pool threads for execution
@@ -194,6 +201,7 @@ def get_pipeline_json(data_source_file, data_target_file, data_logic_file=None, 
 
 def un_deploy_pipeline(pipeline_obj):
   device_ip = pipeline_obj[DEVICE_IP]
+  dev_logger = pipeline_obj[LOGGER]
   pipeline_name = pipeline_obj[PIPELINE_NAME]
   logger.debug("Started un-deploying pipeline " + pipeline_name + " on device " + device_ip)
   print("Started un-deploying pipeline", pipeline_name, "on device", device_ip)
@@ -201,12 +209,14 @@ def un_deploy_pipeline(pipeline_obj):
   time.sleep(2)
   # Set the response from the api call to pipeline object
   status = pipeline_obj[RESPONSE] = "Success"
+  dev_logger.info("un-deploy pipeline " + pipeline_name + " on device " + device_ip + " -> Status: " + status)
   print("Finished un-deploying pipeline", pipeline_name, "on device", device_ip, "Status:", status)
   logger.debug("Finished un-deploying pipeline " + pipeline_name + " on device " + device_ip + " Status: " + status)
   pass
 
 def get_pipeline_status(pipeline_obj):
   device_ip = pipeline_obj[DEVICE_IP]
+  dev_logger = pipeline_obj[LOGGER]
   pipeline_name = pipeline_obj[PIPELINE_NAME]
   logger.debug("Started getting pipeline status for " + pipeline_name + " on device " + device_ip)
   print("Started getting pipeline status for", pipeline_name, "on device", device_ip)
@@ -214,12 +224,14 @@ def get_pipeline_status(pipeline_obj):
   time.sleep(2)
   # Set the response from the api call to pipeline object
   status = pipeline_obj[RESPONSE] = "Success"
+  dev_logger.info("pipeline status " + pipeline_name + " on device " + device_ip + " -> Status: " + status)
   print("Finished getting pipeline status for", pipeline_name, "on device", device_ip, "Status:", status)
   logger.debug("Finished getting pipeline status for " + pipeline_name + " on device " + device_ip + " Status: " + status)
   pass
 
 def deploy_pipeline(pipeline_obj):
   device_ip = pipeline_obj[DEVICE_IP]
+  dev_logger = pipeline_obj[LOGGER]
   pipeline_name = pipeline_obj[PIPELINE_NAME]
   logger.debug("Started deploying pipeline " + pipeline_name + " on device " + device_ip)
   print("Started deploying pipeline", pipeline_name, "on device", device_ip)
@@ -227,21 +239,35 @@ def deploy_pipeline(pipeline_obj):
   time.sleep(2)
   # Set the response from the api call to pipeline object
   status = pipeline_obj[RESPONSE] = "Success"
+  dev_logger.info("deploy pipeline " + pipeline_name + " on device " + device_ip + " -> Status: " + status)
   print("Finished deploying pipeline", pipeline_name, "on device", device_ip, "Status:", status)
   logger.debug("Finished deploying pipeline " + pipeline_name + " on device " + device_ip + " Status: " + status)
   pass
 
 def change_password(pipeline_obj):
   device_ip = pipeline_obj[DEVICE_IP]
+  dev_logger = pipeline_obj[LOGGER]
   logger.debug("Started changing password on device " + device_ip)
   print("Started changing password on device " + device_ip)
   # TODO Send http post request to the device. URL: /api/v1/edge-intelligence/change-password
   time.sleep(2)
   # Set the response from the api call to pipeline object
   status = pipeline_obj[RESPONSE] = "Success"
+  dev_logger.info("change-pwd on device " + device_ip + " -> Status: " + status)
   logger.debug("Finished changing password on device " + device_ip)
   print("Finished changing password on device " + device_ip)
 
+def get_device_logger(operation):
+  log_file_name = operation + "_" + datetime.today().strftime('%Y%m%d_%H%M%S') + ".log"
+  log_file_name = log_file_name.replace("-", "_")
+  device_log_file = os.path.join(os.getenv("EI_CLI_HOME"), log_file_name)
+  device_logger = logging.getLogger(__name__)
+  device_logger.setLevel(logging.INFO)
+  device_logger_file_handler = FileHandler(device_log_file)
+  device_logger_file_handler.setLevel(logging.INFO)
+  device_logger_file_handler.setFormatter(Formatter('%(asctime)s %(message)s'))
+  device_logger.addHandler(device_logger_file_handler)
+  return device_logger
 
 if __name__ == '__main__':
   source_file = "data_source_1.json"
