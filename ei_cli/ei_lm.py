@@ -261,7 +261,7 @@ def get_device_logger(operation):
   log_file_name = operation + "_" + datetime.today().strftime('%Y%m%d_%H%M%S') + ".log"
   log_file_name = log_file_name.replace("-", "_")
   device_log_file = os.path.join(os.getenv("EI_CLI_HOME"), log_file_name)
-  device_logger = logging.getLogger(__name__)
+  device_logger = logging.getLogger("device_logger")
   device_logger.setLevel(logging.INFO)
   device_logger_file_handler = FileHandler(device_log_file)
   device_logger_file_handler.setLevel(logging.INFO)
