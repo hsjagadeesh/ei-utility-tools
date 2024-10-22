@@ -27,6 +27,7 @@ DATA_OUTPUT_MODEL_KEY = "outputModel"
 PIPELINE_JSON = "PIPELINE_JSON"
 RESPONSE = "RESPONSE"
 PASSWORD = "PASSWORD"
+NEW_PASSWORD = "NEW_PASSWORD"
 OPERATION = "OPERATION"
 
 logger = logging.getLogger(__name__)
@@ -74,7 +75,7 @@ def run_in_batch(task_threads, max_thread_spawns_allowed=MAX_BATCH_SIZE):
       task_threads[k].join()
     i = i + max_thread_spawns_allowed
 
-def execute_pipelines(inventory_list, device_pwd=None, operation=None):
+def execute_pipelines(inventory_list, device_pwd=None, operation=None, new_password=None):
   pipeline_obj_list = []
   logger.debug("Number of objects inventory file " + str(len(inventory_list)))
   print(inventory_list)
@@ -83,6 +84,7 @@ def execute_pipelines(inventory_list, device_pwd=None, operation=None):
   for inventory_obj in inventory_list:
     pipeline_obj = get_pipeline_obj(inventory_obj, operation)
     pipeline_obj[PASSWORD] = device_pwd
+    pipeline_obj[NEW_PASSWORD] = new_password
     pipeline_obj_list.append(pipeline_obj)
 
   # Create the pool threads for execution
@@ -106,6 +108,8 @@ def execute_pipeline_obj(operation=None, pipeline_obj=None):
     un_deploy_pipeline(pipeline_obj)
   elif operation == STATUS:
     get_pipeline_status(pipeline_obj)
+  elif operation == CHANGE_PWD:
+    change_password(pipeline_obj)
   else:
     pass
 
@@ -219,13 +223,25 @@ def deploy_pipeline(pipeline_obj):
   pipeline_name = pipeline_obj[PIPELINE_NAME]
   logger.debug("Started deploying pipeline " + pipeline_name + " on device " + device_ip)
   print("Started deploying pipeline", pipeline_name, "on device", device_ip)
-  # TODO Send http post request to the device. URL: /edge-intelligence/pipelines
+  # TODO Send http post request to the device. URL: /api/v1/edge-intelligence/pipelines
   time.sleep(2)
   # Set the response from the api call to pipeline object
   status = pipeline_obj[RESPONSE] = "Success"
   print("Finished deploying pipeline", pipeline_name, "on device", device_ip, "Status:", status)
   logger.debug("Finished deploying pipeline " + pipeline_name + " on device " + device_ip + " Status: " + status)
   pass
+
+def change_password(pipeline_obj):
+  device_ip = pipeline_obj[DEVICE_IP]
+  logger.debug("Started changing password on device " + device_ip)
+  print("Started changing password on device " + device_ip)
+  # TODO Send http post request to the device. URL: /api/v1/edge-intelligence/change-password
+  time.sleep(2)
+  # Set the response from the api call to pipeline object
+  status = pipeline_obj[RESPONSE] = "Success"
+  logger.debug("Finished changing password on device " + device_ip)
+  print("Finished changing password on device " + device_ip)
+
 
 if __name__ == '__main__':
   source_file = "data_source_1.json"

@@ -13,6 +13,8 @@ import shutil
 
 import ei_cli.ei_lm
 from ei_cli.version import VERSION
+# import ei_lm
+# from version import VERSION
 
 logger = logging.getLogger(__name__)
 CONFIG_DIR = "configs"
@@ -133,7 +135,7 @@ def on_pipeline_deploy(cli_args, parser):
     logger.debug("Pipeline deploy selected for " + inventory_file)
     try:
       inventory_data = load_inventory(file_name=inventory_file)
-      ei_lm.execute_pipelines(inventory_data, device_pwd=common_password, operation=ei_lm.DEPLOY)
+      ei_lm.execute_pipelines(inventory_data, operation=ei_lm.DEPLOY, device_pwd=common_password)
     except Exception as ex:
       print(traceback.format_exc())
       logger.error(traceback.format_exc())
@@ -150,7 +152,7 @@ def on_pipeline_undeploy(cli_args, parser):
     logger.debug("Pipeline un-deploy selected for " + inventory_file)
     try:
       inventory_data = load_inventory(file_name=inventory_file)
-      ei_lm.execute_pipelines(inventory_data, device_pwd=common_password, operation=ei_lm.UN_DEPLOY)
+      ei_lm.execute_pipelines(inventory_data, operation=ei_lm.UN_DEPLOY, device_pwd=common_password)
     except Exception as ex:
       print(ex)
   else:
@@ -166,7 +168,7 @@ def on_pipeline_status(cli_args, parser):
     logger.debug("Pipeline status selected for " + inventory_file)
     try:
       inventory_data = load_inventory(file_name=inventory_file)
-      ei_lm.execute_pipelines(inventory_data, device_pwd=common_password, operation=ei_lm.STATUS)
+      ei_lm.execute_pipelines(inventory_data, operation=ei_lm.STATUS, device_pwd=common_password)
     except Exception as ex:
       print(ex)
   else:
@@ -181,7 +183,21 @@ def on_agent_reset(cli_args, parser):
   print("on_agent_reset", cli_args)
 
 def on_user_change_pwd(cli_args, parser):
-  print("on_user_change_pwd", cli_args)
+  logger.debug("Calling on_user_change_pwd()")
+  old_password = getpass.getpass('Enter the old password:')
+  inventory_file = cli_args.get("inventory_file", "")
+  new_password = getpass.getpass('Enter the new password:')
+  if is_valid_string(inventory_file):
+    logger.debug("Change password selected for " + inventory_file)
+    try:
+      inventory_data = load_inventory(file_name=inventory_file)
+      ei_lm.execute_pipelines(inventory_data, operation=ei_lm.CHANGE_PWD, device_pwd=old_password, new_password=new_password)
+    except Exception as ex:
+      print(ex)
+  else:
+    print("\nPlease provide a valid pipeline inventory file option\n")
+    logger.error("Invalid : pipeline inventory file options :" + str(inventory_file))
+    parser.print_help()
 
 def load_inventory(file_name):
   # Check EI_CLI_HOME env is set or not
