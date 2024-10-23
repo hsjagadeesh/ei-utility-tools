@@ -24,7 +24,7 @@ EI_CLI_HOME = "EI_CLI_HOME"
 
 def configure_logging():
   if os.getenv("EI_CLI_HOME") is None:
-    print("EI_CLI_HOME env variable is not set")
+    print("EI_CLI_HOME env variable is not set. Please set the EI_CLI_HOME env variable")
     exit(0)
   _config_dir = os.getenv("EI_CLI_HOME", os.path.join(os.getenv("HOME"), ".ei"))
   log_path = os.path.join(_config_dir, 'ei-cli.log')
