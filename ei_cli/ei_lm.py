@@ -3,6 +3,7 @@ import os
 import time
 from datetime import datetime
 import json
+import traceback
 
 import logging
 from logging import FileHandler
@@ -23,6 +24,7 @@ DATA_SOURCE_FILE = "DATA_SOURCE_FILE"
 DATA_TARGET_FILE = "DATA_TARGET_FILE"
 DATA_LOGIC_FILE = "DATA_LOGIC_FILE"
 DATA_VARIABLES_FILE = "DATA_VARIABLES_FILE"
+
 DATA_SOURCE_KEY = "dataSources"
 DATA_TARGET_KEY = "dataTarget"
 DATA_LOGIC_KEY = "scriptedDataLogic"
@@ -85,6 +87,7 @@ def execute_pipelines(inventory_list, operation=None, device_pwd=None,  new_pass
   logger.debug("Number of objects inventory file " + str(len(inventory_list)))
   print(inventory_list)
   device_logger = get_device_logger(operation)
+  # device_logger = DeviceLogger(operation)
 
   # Create pipeline object list from inventory list
   for inventory_obj in inventory_list:
@@ -104,6 +107,9 @@ def execute_pipelines(inventory_list, operation=None, device_pwd=None,  new_pass
   # Start the thread execution in batches
   if len(ei_cli_threads) > 0:
     run_in_batch(ei_cli_threads, MAX_BATCH_SIZE)
+
+  # Close the device logger
+  # device_logger.close()
 
 def execute_pipeline_obj(operation=None, pipeline_obj=None):
   if operation is None:
@@ -268,6 +274,30 @@ def get_device_logger(operation):
   device_logger_file_handler.setFormatter(Formatter('%(asctime)s %(message)s'))
   device_logger.addHandler(device_logger_file_handler)
   return device_logger
+
+class DeviceLogger:
+  def __init__(self, operation):
+    log_file_name = operation + "_" + datetime.today().strftime('%Y%m%d_%H%M%S') + ".log"
+    log_file_name = log_file_name.replace("-", "_")
+    log_file_path = os.path.join(os.getenv("EI_CLI_HOME"), log_file_name)
+    self.file_obj = open(log_file_path, "w")
+
+  def info(self, message):
+    try:
+      # print(message)
+      self.file_obj.write(message + "\n")
+      logger.info("Device Log: " + message)
+    except:
+      print(traceback.format_exc())
+      print("Warning: Unable to write to the device log file")
+      logger.error(traceback.format_exc())
+
+  def close(self):
+    try:
+      print("")
+      self.file_obj.close()
+    except:
+      logger.error(traceback.format_exc())
 
 if __name__ == '__main__':
   source_file = "data_source_1.json"
