@@ -4,10 +4,13 @@ import time
 from datetime import datetime
 import json
 import traceback
-
+import requests
+import urllib3
 import logging
 from logging import FileHandler
 from logging import Formatter
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 CONFIG_DIR = "configs"
 EI_CLI_HOME = "EI_CLI_HOME"
@@ -207,14 +210,20 @@ def get_pipeline_json(data_source_file, data_target_file, data_logic_file=None, 
 
 def un_deploy_pipeline(pipeline_obj):
   device_ip = pipeline_obj[DEVICE_IP]
+  device_pwd = pipeline_obj[PASSWORD]
   dev_logger = pipeline_obj[LOGGER]
   pipeline_name = pipeline_obj[PIPELINE_NAME]
   logger.debug("Started un-deploying pipeline " + pipeline_name + " on device " + device_ip)
   print("Started un-deploying pipeline", pipeline_name, "on device", device_ip)
-  # TODO Send http delete request to the device. URL: /api/v1/edge-intelligence/pipelines/{pipelineId}
-  time.sleep(2)
-  # Set the response from the api call to pipeline object
-  status = pipeline_obj[RESPONSE] = "Success"
+  access_token = get_access_token(device_ip, password=device_pwd)
+  if access_token is not None:
+    print(access_token)
+    # TODO Send http delete request to the device. URL: /api/v1/edge-intelligence/pipelines/{pipelineId}
+    time.sleep(2)
+    # Set the response from the api call to pipeline object
+    status = pipeline_obj[RESPONSE] = "Success"
+  else:
+   status = pipeline_obj[RESPONSE] = "Failed"
   dev_logger.info("un-deploy pipeline " + pipeline_name + " on device " + device_ip + " -> Status: " + status)
   print("Finished un-deploying pipeline", pipeline_name, "on device", device_ip, "Status:", status)
   logger.debug("Finished un-deploying pipeline " + pipeline_name + " on device " + device_ip + " Status: " + status)
@@ -222,14 +231,20 @@ def un_deploy_pipeline(pipeline_obj):
 
 def get_pipeline_status(pipeline_obj):
   device_ip = pipeline_obj[DEVICE_IP]
+  device_pwd = pipeline_obj[PASSWORD]
   dev_logger = pipeline_obj[LOGGER]
   pipeline_name = pipeline_obj[PIPELINE_NAME]
   logger.debug("Started getting pipeline status for " + pipeline_name + " on device " + device_ip)
   print("Started getting pipeline status for", pipeline_name, "on device", device_ip)
-  # TODO Send http get status request to the device. URL: /api/v1/edge-intelligence/pipelines/{pipelineId}/status
-  time.sleep(2)
-  # Set the response from the api call to pipeline object
-  status = pipeline_obj[RESPONSE] = "Success"
+  access_token = get_access_token(device_ip, password=device_pwd)
+  if access_token is not None:
+    print(access_token)
+    # TODO Send http get status request to the device. URL: /api/v1/edge-intelligence/pipelines/{pipelineId}/status
+    time.sleep(2)
+    # Set the response from the api call to pipeline object
+    status = pipeline_obj[RESPONSE] = "Success"
+  else:
+   status = pipeline_obj[RESPONSE] = "Failed"
   dev_logger.info("pipeline status " + pipeline_name + " on device " + device_ip + " -> Status: " + status)
   print("Finished getting pipeline status for", pipeline_name, "on device", device_ip, "Status:", status)
   logger.debug("Finished getting pipeline status for " + pipeline_name + " on device " + device_ip + " Status: " + status)
@@ -237,14 +252,20 @@ def get_pipeline_status(pipeline_obj):
 
 def deploy_pipeline(pipeline_obj):
   device_ip = pipeline_obj[DEVICE_IP]
+  device_pwd = pipeline_obj[PASSWORD]
   dev_logger = pipeline_obj[LOGGER]
   pipeline_name = pipeline_obj[PIPELINE_NAME]
   logger.debug("Started deploying pipeline " + pipeline_name + " on device " + device_ip)
   print("Started deploying pipeline", pipeline_name, "on device", device_ip)
-  # TODO Send http post request to the device. URL: /api/v1/edge-intelligence/pipelines
-  time.sleep(2)
-  # Set the response from the api call to pipeline object
-  status = pipeline_obj[RESPONSE] = "Success"
+  access_token = get_access_token(device_ip, password=device_pwd)
+  if access_token is not None:
+    print(access_token)
+    # TODO Send http post request to the device. URL: /api/v1/edge-intelligence/pipelines
+    time.sleep(2)
+    # Set the response from the api call to pipeline object
+    status = pipeline_obj[RESPONSE] = "Success"
+  else:
+   status = pipeline_obj[RESPONSE] = "Failed"
   dev_logger.info("deploy pipeline " + pipeline_name + " on device " + device_ip + " -> Status: " + status)
   print("Finished deploying pipeline", pipeline_name, "on device", device_ip, "Status:", status)
   logger.debug("Finished deploying pipeline " + pipeline_name + " on device " + device_ip + " Status: " + status)
@@ -274,6 +295,35 @@ def get_device_logger(operation):
   device_logger_file_handler.setFormatter(Formatter('%(asctime)s %(message)s'))
   device_logger.addHandler(device_logger_file_handler)
   return device_logger
+
+def get_access_token(device_ip, username="admin", password="None"):
+  access_token = None
+  url = "https://" + device_ip + "/api/v1/edge-intelligence/token"
+  post_data = {
+    "username": username,
+    "password": password
+  }
+  logger.debug("Fetching access token for device " + device_ip)
+  headers = {'Content-Type': 'application/json'}
+  for i in range(2):
+    token_response = requests.post(url=url, data=json.dumps(post_data), headers=headers, verify=False)
+    time.sleep(2)
+    if token_response is not None and token_response.status_code == 200:
+      token_json = json.loads(token_response.text.encode('utf8'))
+      access_token = token_json.get('data').get('token')
+      break
+    logger.debug("Retrying get_access_token " + str(i))
+    time.sleep(2)
+
+  if token_response is None:
+    logger.debug("Token Response is None for url " + url)
+
+  if token_response is not None and token_response.status_code != 200:
+    token_json = json.loads(token_response.text.encode('utf8'))
+    logger.debug("Error fetching token for url " + url + str(token_response.status_code) + str(token_json))
+    print("Error fetching token for device " + device_ip + " Response: " + str(token_json))
+
+  return access_token
 
 class DeviceLogger:
   def __init__(self, operation):
