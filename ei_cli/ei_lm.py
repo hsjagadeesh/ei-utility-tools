@@ -227,7 +227,6 @@ def un_deploy_pipeline(pipeline_obj):
   dev_logger.info("un-deploy pipeline " + pipeline_name + " on device " + device_ip + " -> Status: " + status)
   print("Finished un-deploying pipeline", pipeline_name, "on device", device_ip, "Status:", status)
   logger.debug("Finished un-deploying pipeline " + pipeline_name + " on device " + device_ip + " Status: " + status)
-  pass
 
 def get_pipeline_status(pipeline_obj):
   device_ip = pipeline_obj[DEVICE_IP]
@@ -248,7 +247,6 @@ def get_pipeline_status(pipeline_obj):
   dev_logger.info("pipeline status " + pipeline_name + " on device " + device_ip + " -> Status: " + status)
   print("Finished getting pipeline status for", pipeline_name, "on device", device_ip, "Status:", status)
   logger.debug("Finished getting pipeline status for " + pipeline_name + " on device " + device_ip + " Status: " + status)
-  pass
 
 def deploy_pipeline(pipeline_obj):
   device_ip = pipeline_obj[DEVICE_IP]
@@ -259,17 +257,41 @@ def deploy_pipeline(pipeline_obj):
   print("Started deploying pipeline", pipeline_name, "on device", device_ip)
   access_token = get_access_token(device_ip, password=device_pwd)
   if access_token is not None:
-    print(access_token)
-    # TODO Send http post request to the device. URL: /api/v1/edge-intelligence/pipelines
-    time.sleep(2)
-    # Set the response from the api call to pipeline object
-    status = pipeline_obj[RESPONSE] = "Success"
+    url = "https://" + device_ip + "/api/v1/edge-intelligence/pipelines"
+    headers = {
+      'Authorization': 'Bearer ' + access_token,
+      'Content-Type': 'application/json'
+    }
+    post_data = {
+      # TODO
+    }
+    response = requests.post(url=url, data=json.dumps(post_data), headers=headers, verify=False)
+    if response is not None:
+      res_json = json.loads(response.text.encode('utf8'))
+      res_code = response.status_code
+      # Check for status
+      if res_code == 200:
+        status = pipeline_obj[STATUS] = "Success"
+        message = pipeline_obj[RESPONSE] = "Status Code: " + str(res_code) + " Response: " + str(res_json)
+        logger.debug("Successfully deployed the pipeline " + pipeline_name + " on device " + device_ip + " " + message)
+      else:
+        # res_code != 200:
+        status = pipeline_obj[STATUS] = "Failed"
+        message = pipeline_obj[RESPONSE] = "Status Code: " + str(res_code) + " Response: " + str(res_json)
+        logger.debug("Error deploying the pipeline " + pipeline_name + " on device " + device_ip + " " + message)
+    else:
+      status = pipeline_obj[STATUS] = "Failed"
+      message = pipeline_obj[RESPONSE] = "Response is NULL for deploy_pipeline for device " + device_ip
+      logger.debug("Error deploying the pipeline " + pipeline_name + " on device " + device_ip + " " + message)
+
   else:
-   status = pipeline_obj[RESPONSE] = "Failed"
-  dev_logger.info("deploy pipeline " + pipeline_name + " on device " + device_ip + " -> Status: " + status)
-  print("Finished deploying pipeline", pipeline_name, "on device", device_ip, "Status:", status)
+    status = pipeline_obj[STATUS] = "Failed"
+    message = pipeline_obj[RESPONSE] = "Not able to fetch the access token for device " + device_ip
+    logger.debug("Error deploying the pipeline " + pipeline_name + " on device " + device_ip + " " + message)
+
+  dev_logger.info("deploy pipeline " + pipeline_name + " on device " + device_ip + " -> Status: " + status + " " + message)
+  print("Finished deploying pipeline " + pipeline_name + " on device " + device_ip + " Status: " + status)
   logger.debug("Finished deploying pipeline " + pipeline_name + " on device " + device_ip + " Status: " + status)
-  pass
 
 def change_password(pipeline_obj):
   device_ip = pipeline_obj[DEVICE_IP]
@@ -287,35 +309,26 @@ def change_password(pipeline_obj):
   }
   headers = {'Content-Type': 'application/json'}
   response = requests.post(url=url, data=json.dumps(post_data), headers=headers, verify=False)
-  if response is not None and response.status_code == 200:
-    logger.debug("Password updated successfully for device " + device_ip)
-    status = pipeline_obj[RESPONSE] = "Success"
+  if response is not None:
+    res_json = json.loads(response.text.encode('utf8'))
+    res_code = response.status_code
+    if res_code == 200:
+      status = pipeline_obj[STATUS] = "Success"
+      message = pipeline_obj[RESPONSE] = "Status Code: " + str(res_code) + " Response: " + str(res_json)
+      logger.debug("Password updated successfully for device " + device_ip + " " + message)
+    else:
+      # # res_code != 200:
+      status = pipeline_obj[STATUS] = "Failed"
+      message = pipeline_obj[RESPONSE] = "Status Code: " + str(res_code) + " Response: " + str(res_json)
+      logger.debug("Error updating password for device " + device_ip + " " + message)
+  else:
+    status = pipeline_obj[STATUS] = "Failed"
+    message = pipeline_obj[RESPONSE] = "Response is NULL for change_password for device " + device_ip
+    logger.debug("Error updating password for device " + device_ip + " " + message)
 
-  if response is None:
-    logger.debug("Response is NULL for change password request for url " + url)
-    status = pipeline_obj[RESPONSE] = "Failed"
-
-  if response is not None and response.status_code != 200:
-    token_json = json.loads(response.text.encode('utf8'))
-    logger.debug("Error updating password for device " + device_ip + str(response.status_code) + str(token_json))
-    print("Error updating password for device " + device_ip + " Response: " + str(token_json))
-    status = pipeline_obj[RESPONSE] = "Failed" + " Response: " + str(token_json)
-
-  dev_logger.info("change-pwd on device " + device_ip + " -> Status: " + status)
-  logger.debug("Finished changing password on device " + device_ip)
-  print("Finished changing password on device " + device_ip)
-
-def get_device_logger(operation):
-  log_file_name = operation + "_" + datetime.today().strftime('%Y%m%d_%H%M%S') + ".log"
-  log_file_name = log_file_name.replace("-", "_")
-  device_log_file = os.path.join(os.getenv("EI_CLI_HOME"), log_file_name)
-  device_logger = logging.getLogger("device_logger")
-  device_logger.setLevel(logging.INFO)
-  device_logger_file_handler = FileHandler(device_log_file)
-  device_logger_file_handler.setLevel(logging.INFO)
-  device_logger_file_handler.setFormatter(Formatter('%(asctime)s %(message)s'))
-  device_logger.addHandler(device_logger_file_handler)
-  return device_logger
+  dev_logger.info("change-pwd on device " + device_ip + " -> Status: " + status + " " + message)
+  logger.debug("Finished changing password on device " + device_ip + " Status: " + status)
+  print("Finished changing password on device " + device_ip + " Status: " + status)
 
 def get_access_token(device_ip, username="admin", password="None"):
   access_token = None
@@ -336,15 +349,24 @@ def get_access_token(device_ip, username="admin", password="None"):
     logger.debug("Retrying get_access_token " + str(i))
     time.sleep(2)
 
-  if token_response is None:
-    logger.debug("Response is NULL for get access token request for url " + url)
-
   if token_response is not None and token_response.status_code != 200:
     token_json = json.loads(token_response.text.encode('utf8'))
     logger.debug("Error fetching token for device " + device_ip + str(token_response.status_code) + str(token_json))
     print("Error fetching token for device " + device_ip + " Response: " + str(token_json))
 
   return access_token
+
+def get_device_logger(operation):
+  log_file_name = operation + "_" + datetime.today().strftime('%Y%m%d_%H%M%S') + ".log"
+  log_file_name = log_file_name.replace("-", "_")
+  device_log_file = os.path.join(os.getenv("EI_CLI_HOME"), log_file_name)
+  device_logger = logging.getLogger("device_logger")
+  device_logger.setLevel(logging.INFO)
+  device_logger_file_handler = FileHandler(device_log_file)
+  device_logger_file_handler.setLevel(logging.INFO)
+  device_logger_file_handler.setFormatter(Formatter('%(asctime)s %(message)s'))
+  device_logger.addHandler(device_logger_file_handler)
+  return device_logger
 
 class DeviceLogger:
   def __init__(self, operation):
