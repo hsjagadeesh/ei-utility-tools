@@ -215,17 +215,33 @@ def un_deploy_pipeline(pipeline_obj):
   pipeline_name = pipeline_obj[PIPELINE_NAME]
   logger.debug("Started un-deploying pipeline " + pipeline_name + " on device " + device_ip)
   print("Started un-deploying pipeline", pipeline_name, "on device", device_ip)
-  access_token = get_access_token(device_ip, password=device_pwd)
-  if access_token is not None:
-    print(access_token)
-    # TODO Send http delete request to the device. URL: /api/v1/edge-intelligence/pipelines/{pipelineId}
-    time.sleep(2)
-    # Set the response from the api call to pipeline object
-    status = pipeline_obj[RESPONSE] = "Success"
-  else:
-   status = pipeline_obj[RESPONSE] = "Failed"
-  dev_logger.info("un-deploy pipeline " + pipeline_name + " on device " + device_ip + " -> Status: " + status)
-  print("Finished un-deploying pipeline", pipeline_name, "on device", device_ip, "Status:", status)
+  try:
+    access_token = get_access_token(device_ip, password=device_pwd)
+    url = "https://" + device_ip + "/api/v1/edge-intelligence/pipelines/" + pipeline_name
+    headers = {
+      'Authorization': 'Bearer ' + access_token,
+      'Content-Type': 'application/json'
+    }
+    response = requests.delete(url=url, headers=headers, verify=False)
+    res_json = json.loads(response.text.encode('utf8'))
+    res_code = response.status_code
+    # Check for status
+    if res_code == 200:
+      status = pipeline_obj[STATUS] = "Success"
+      message = pipeline_obj[RESPONSE] = "Status Code: " + str(res_code) + ", Response: " + str(res_json)
+      logger.debug("Successfully un-deployed pipeline for " + pipeline_name + " on device " + device_ip + " " + message)
+    else:
+      # res_code != 200:
+      status = pipeline_obj[STATUS] = "Failed"
+      message = pipeline_obj[RESPONSE] = "Status Code: " + str(res_code) + ", Response: " + str(res_json)
+      logger.debug("Error in un-deploy pipeline for " + pipeline_name + " on device " + device_ip + " " + message)
+  except Exception as ex:
+    status = pipeline_obj[STATUS] = "Failed"
+    message = pipeline_obj[RESPONSE] = str(ex)
+    logger.debug("Exception in un-deploy pipeline for " + pipeline_name + " on device " + device_ip + " " + str(ex))
+
+  dev_logger.info("un-deploy pipeline " + pipeline_name + " on device " + device_ip + " -> Status: " + status + ", " + message)
+  print("Finished un-deploying pipeline " + pipeline_name + " on device " + device_ip + " Status: " + status)
   logger.debug("Finished un-deploying pipeline " + pipeline_name + " on device " + device_ip + " Status: " + status)
 
 def get_pipeline_status(pipeline_obj):
@@ -235,17 +251,33 @@ def get_pipeline_status(pipeline_obj):
   pipeline_name = pipeline_obj[PIPELINE_NAME]
   logger.debug("Started getting pipeline status for " + pipeline_name + " on device " + device_ip)
   print("Started getting pipeline status for", pipeline_name, "on device", device_ip)
-  access_token = get_access_token(device_ip, password=device_pwd)
-  if access_token is not None:
-    print(access_token)
-    # TODO Send http get status request to the device. URL: /api/v1/edge-intelligence/pipelines/{pipelineId}/status
-    time.sleep(2)
-    # Set the response from the api call to pipeline object
-    status = pipeline_obj[RESPONSE] = "Success"
-  else:
-   status = pipeline_obj[RESPONSE] = "Failed"
-  dev_logger.info("pipeline status " + pipeline_name + " on device " + device_ip + " -> Status: " + status)
-  print("Finished getting pipeline status for", pipeline_name, "on device", device_ip, "Status:", status)
+  try:
+    access_token = get_access_token(device_ip, password=device_pwd)
+    url = "https://" + device_ip + "/api/v1/edge-intelligence/pipelines/" + pipeline_name + "/status"
+    headers = {
+      'Authorization': 'Bearer ' + access_token,
+      'Content-Type': 'application/json'
+    }
+    response = requests.get(url=url, headers=headers, verify=False)
+    res_json = json.loads(response.text.encode('utf8'))
+    res_code = response.status_code
+    # Check for status
+    if res_code == 200:
+      status = pipeline_obj[STATUS] = "Success"
+      message = pipeline_obj[RESPONSE] = "Status Code: " + str(res_code) + ", Response: " + str(res_json)
+      logger.debug("Successfully got pipeline status for " + pipeline_name + " on device " + device_ip + " " + message)
+    else:
+      # res_code != 200:
+      status = pipeline_obj[STATUS] = "Failed"
+      message = pipeline_obj[RESPONSE] = "Status Code: " + str(res_code) + ", Response: " + str(res_json)
+      logger.debug("Error in getting pipeline status for " + pipeline_name + " on device " + device_ip + " " + message)
+  except Exception as ex:
+    status = pipeline_obj[STATUS] = "Failed"
+    message = pipeline_obj[RESPONSE] = str(ex)
+    logger.debug("Exception in get pipeline status for " + pipeline_name + " on device " + device_ip + " " + str(ex))
+
+  dev_logger.info("pipeline status" + pipeline_name + " on device " + device_ip + " -> Status: " + status + ", " + message)
+  print("Finished getting pipeline status for " + pipeline_name + " on device " + device_ip + " Status: " + status)
   logger.debug("Finished getting pipeline status for " + pipeline_name + " on device " + device_ip + " Status: " + status)
 
 def deploy_pipeline(pipeline_obj):
@@ -257,37 +289,26 @@ def deploy_pipeline(pipeline_obj):
   print("Started deploying pipeline", pipeline_name, "on device", device_ip)
   try:
     access_token = get_access_token(device_ip, password=device_pwd)
-    if access_token is not None:
-      url = "https://" + device_ip + "/api/v1/edge-intelligence/pipelines"
-      headers = {
-        'Authorization': 'Bearer ' + access_token,
-        'Content-Type': 'application/json'
-      }
-      post_data = {
-        # TODO
-      }
-      response = requests.post(url=url, data=json.dumps(post_data), headers=headers, verify=False)
-      if response is not None:
-        res_json = json.loads(response.text.encode('utf8'))
-        res_code = response.status_code
-        # Check for status
-        if res_code == 200:
-          status = pipeline_obj[STATUS] = "Success"
-          message = pipeline_obj[RESPONSE] = "Status Code: " + str(res_code) + ", Response: " + str(res_json)
-          logger.debug("Successfully deployed the pipeline " + pipeline_name + " on device " + device_ip + " " + message)
-        else:
-          # res_code != 200:
-          status = pipeline_obj[STATUS] = "Failed"
-          message = pipeline_obj[RESPONSE] = "Status Code: " + str(res_code) + ", Response: " + str(res_json)
-          logger.debug("Error deploying the pipeline " + pipeline_name + " on device " + device_ip + " " + message)
-      else:
-        status = pipeline_obj[STATUS] = "Failed"
-        message = pipeline_obj[RESPONSE] = "Response is NULL for deploy_pipeline for device " + device_ip
-        logger.debug("Error deploying the pipeline " + pipeline_name + " on device " + device_ip + " " + message)
-
+    url = "https://" + device_ip + "/api/v1/edge-intelligence/pipelines"
+    headers = {
+      'Authorization': 'Bearer ' + access_token,
+      'Content-Type': 'application/json'
+    }
+    post_data = {
+      # TODO
+    }
+    response = requests.post(url=url, data=json.dumps(post_data), headers=headers, verify=False)
+    res_json = json.loads(response.text.encode('utf8'))
+    res_code = response.status_code
+    # Check for status
+    if res_code == 200:
+      status = pipeline_obj[STATUS] = "Success"
+      message = pipeline_obj[RESPONSE] = "Status Code: " + str(res_code) + ", Response: " + str(res_json)
+      logger.debug("Successfully deployed the pipeline " + pipeline_name + " on device " + device_ip + " " + message)
     else:
+      # res_code != 200:
       status = pipeline_obj[STATUS] = "Failed"
-      message = pipeline_obj[RESPONSE] = "Not able to fetch the access token for device " + device_ip
+      message = pipeline_obj[RESPONSE] = "Status Code: " + str(res_code) + ", Response: " + str(res_json)
       logger.debug("Error deploying the pipeline " + pipeline_name + " on device " + device_ip + " " + message)
   except Exception as ex:
     status = pipeline_obj[STATUS] = "Failed"
@@ -315,21 +336,16 @@ def change_password(pipeline_obj):
   try:
     headers = {'Content-Type': 'application/json'}
     response = requests.post(url=url, data=json.dumps(post_data), headers=headers, verify=False)
-    if response is not None:
-      res_json = json.loads(response.text.encode('utf8'))
-      res_code = response.status_code
-      if res_code == 200:
-        status = pipeline_obj[STATUS] = "Success"
-        message = pipeline_obj[RESPONSE] = "Http Code: " + str(res_code) + ", Response: " + str(res_json)
-        logger.debug("Password updated successfully for device " + device_ip + " " + message)
-      else:
-        # # res_code != 200:
-        status = pipeline_obj[STATUS] = "Failed"
-        message = pipeline_obj[RESPONSE] = "Http Code: " + str(res_code) + ", Response: " + str(res_json)
-        logger.debug("Error updating password for device " + device_ip + " " + message)
+    res_json = json.loads(response.text.encode('utf8'))
+    res_code = response.status_code
+    if res_code == 200:
+      status = pipeline_obj[STATUS] = "Success"
+      message = pipeline_obj[RESPONSE] = "Http Code: " + str(res_code) + ", Response: " + str(res_json)
+      logger.debug("Password updated successfully for device " + device_ip + " " + message)
     else:
+      # res_code != 200:
       status = pipeline_obj[STATUS] = "Failed"
-      message = pipeline_obj[RESPONSE] = "Response is NULL for change_password for device " + device_ip
+      message = pipeline_obj[RESPONSE] = "Http Code: " + str(res_code) + ", Response: " + str(res_json)
       logger.debug("Error updating password for device " + device_ip + " " + message)
   except Exception as ex:
     status = pipeline_obj[STATUS] = "Failed"
@@ -350,23 +366,18 @@ def get_access_token(device_ip, username="admin", password="None"):
   logger.debug("Fetching access token for device " + device_ip)
   try:
     headers = {'Content-Type': 'application/json'}
-    for i in range(2):
-      token_response = requests.post(url=url, data=json.dumps(post_data), headers=headers, verify=False)
-      time.sleep(2)
-      if token_response is not None and token_response.status_code == 200:
-        token_json = json.loads(token_response.text.encode('utf8'))
-        access_token = token_json.get('data').get('token')
-        break
-      logger.debug("Retrying get_access_token " + str(i))
-      time.sleep(2)
-
-    if token_response is not None and token_response.status_code != 200:
-      token_json = json.loads(token_response.text.encode('utf8'))
-      logger.debug("Error fetching token for device " + device_ip + str(token_response.status_code) + str(token_json))
-      print("Error fetching token for device " + device_ip + " Response: " + str(token_json))
+    response = requests.post(url=url, data=json.dumps(post_data), headers=headers, verify=False)
+    res_json = json.loads(response.text.encode('utf8'))
+    res_code = response.status_code
+    if res_code == 200:
+      access_token = res_json.get('data').get('token')
+    else:
+      # res_code != 200:
+      logger.debug("Error fetching token for device " + device_ip + str(res_code) + str(res_json))
+      print("Error fetching token for device " + device_ip + " Response: " + str(res_json))
   except Exception as ex:
-   logger.debug("Exception in get_access_token for " + device_ip + " " + str(ex))
-   access_token = None
+    logger.debug("Exception in get_access_token for device " + device_ip + " " + str(ex))
+    raise Exception("Exception in get_access_token for device " + device_ip + " " + str(ex))
 
   return access_token
 
