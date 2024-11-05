@@ -273,13 +273,34 @@ def deploy_pipeline(pipeline_obj):
 
 def change_password(pipeline_obj):
   device_ip = pipeline_obj[DEVICE_IP]
+  username = "admin"
+  old_device_pwd = pipeline_obj[PASSWORD]
+  new_device_pwd = pipeline_obj[NEW_PASSWORD]
   dev_logger = pipeline_obj[LOGGER]
   logger.debug("Started changing password on device " + device_ip)
   print("Started changing password on device " + device_ip)
-  # TODO Send http post request to the device. URL: /api/v1/edge-intelligence/change-password
-  time.sleep(2)
-  # Set the response from the api call to pipeline object
-  status = pipeline_obj[RESPONSE] = "Success"
+  url = "https://" + device_ip + "/api/v1/edge-intelligence/change-password"
+  post_data = {
+    "username": username,
+    "old_password": old_device_pwd,
+    "new_password": new_device_pwd
+  }
+  headers = {'Content-Type': 'application/json'}
+  response = requests.post(url=url, data=json.dumps(post_data), headers=headers, verify=False)
+  if response is not None and response.status_code == 200:
+    logger.debug("Password updated successfully for device " + device_ip)
+    status = pipeline_obj[RESPONSE] = "Success"
+
+  if response is None:
+    logger.debug("Response is NULL for change password request for url " + url)
+    status = pipeline_obj[RESPONSE] = "Failed"
+
+  if response is not None and response.status_code != 200:
+    token_json = json.loads(response.text.encode('utf8'))
+    logger.debug("Error updating password for device " + device_ip + str(response.status_code) + str(token_json))
+    print("Error updating password for device " + device_ip + " Response: " + str(token_json))
+    status = pipeline_obj[RESPONSE] = "Failed" + " Response: " + str(token_json)
+
   dev_logger.info("change-pwd on device " + device_ip + " -> Status: " + status)
   logger.debug("Finished changing password on device " + device_ip)
   print("Finished changing password on device " + device_ip)
@@ -316,11 +337,11 @@ def get_access_token(device_ip, username="admin", password="None"):
     time.sleep(2)
 
   if token_response is None:
-    logger.debug("Token Response is None for url " + url)
+    logger.debug("Response is NULL for get access token request for url " + url)
 
   if token_response is not None and token_response.status_code != 200:
     token_json = json.loads(token_response.text.encode('utf8'))
-    logger.debug("Error fetching token for url " + url + str(token_response.status_code) + str(token_json))
+    logger.debug("Error fetching token for device " + device_ip + str(token_response.status_code) + str(token_json))
     print("Error fetching token for device " + device_ip + " Response: " + str(token_json))
 
   return access_token
