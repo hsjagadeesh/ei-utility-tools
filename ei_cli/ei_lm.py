@@ -1,6 +1,5 @@
 from threading import Thread
 import os
-import time
 from datetime import datetime
 import json
 import traceback
