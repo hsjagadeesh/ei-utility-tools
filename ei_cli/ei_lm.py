@@ -260,11 +260,13 @@ def get_pipeline_status(pipeline_obj):
     response = requests.get(url=url, headers=headers, verify=False)
     res_json = json.loads(response.text.encode('utf8'))
     res_code = response.status_code
+    pipeline_status = "NA"
     # Check for status
     if res_code == 200:
       status = pipeline_obj[STATUS] = "Success"
       message = pipeline_obj[RESPONSE] = "Status Code: " + str(res_code) + ", Response: " + str(res_json)
       logger.debug("Successfully got pipeline status for " + pipeline_name + " on device " + device_ip + " " + message)
+      pipeline_status = res_json.get('data').get('healthStatus').get('pipelineStatus')
     else:
       # res_code != 200:
       status = pipeline_obj[STATUS] = "Failed"
@@ -275,9 +277,13 @@ def get_pipeline_status(pipeline_obj):
     message = pipeline_obj[RESPONSE] = str(ex)
     logger.debug("Exception in get pipeline status for " + pipeline_name + " on device " + device_ip + " " + str(ex))
 
-  dev_logger.info("pipeline status" + pipeline_name + " on device " + device_ip + " -> Status: " + status + ", " + message)
-  print("Finished getting pipeline status for " + pipeline_name + " on device " + device_ip + " Status: " + status)
-  logger.debug("Finished getting pipeline status for " + pipeline_name + " on device " + device_ip + " Status: " + status)
+  dev_logger.info("pipeline status " + pipeline_name + " on device " + device_ip + " -> Status: " + status + ", " + message)
+  if status == "Success":
+    print("Finished getting pipeline status for " + pipeline_name + " on device " + device_ip + " Status: " + pipeline_status)
+    logger.debug("Finished getting pipeline status for " + pipeline_name + " on device " + device_ip + " Status: " + pipeline_status)
+  else:
+    print("Finished getting pipeline status for " + pipeline_name + " on device " + device_ip + " Status: " + status)
+    logger.debug("Finished getting pipeline status for " + pipeline_name + " on device " + device_ip + " Status: " + status)
 
 def deploy_pipeline(pipeline_obj):
   device_ip = pipeline_obj[DEVICE_IP]
