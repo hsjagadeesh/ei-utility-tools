@@ -290,6 +290,7 @@ def deploy_pipeline(pipeline_obj):
   device_pwd = pipeline_obj[PASSWORD]
   dev_logger = pipeline_obj[LOGGER]
   pipeline_name = pipeline_obj[PIPELINE_NAME]
+  pipeline_json = pipeline_obj[PIPELINE_JSON]
   logger.debug("Started deploying pipeline " + pipeline_name + " on device " + device_ip)
   print("Started deploying pipeline", pipeline_name, "on device", device_ip)
   try:
@@ -300,8 +301,12 @@ def deploy_pipeline(pipeline_obj):
       'Content-Type': 'application/json'
     }
     post_data = {
-      # TODO
+      "name": pipeline_name,
+      "data": pipeline_json
     }
+    logger.debug("Pipeline Json for " + pipeline_name + " on device " + device_ip)
+    logger.debug(json.dumps(post_data))
+    logger.debug("===========================================================================================")
     response = requests.post(url=url, data=json.dumps(post_data), headers=headers, verify=False)
     res_json = json.loads(response.text.encode('utf8'))
     res_code = response.status_code
