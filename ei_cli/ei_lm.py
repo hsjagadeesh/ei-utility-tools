@@ -204,7 +204,19 @@ def get_pipeline_json(data_source_file, data_target_file, data_logic_file=None, 
     pipeline_json[DATA_OUTPUT_MODEL_KEY] = data_target_json[DATA_OUTPUT_MODEL_KEY]
   if data_logic_json is not None:
     pipeline_json[DATA_LOGIC_KEY] = data_logic_json[DATA_LOGIC_KEY]
-  # TODO Apply template variables
+
+  # Apply template variables if applicable
+  if data_vars_json is not None:
+    pipeline_json_str = json.dumps(pipeline_json)
+    # print(pipeline_json_str)
+    logger.debug("Pipeline Json before templatization " + pipeline_json_str + " " + data_vars_file)
+    for key, value in data_vars_json.items():
+      temp_var = "$" + key
+      pipeline_json_str = pipeline_json_str.replace(temp_var, str(value))
+    logger.debug("Pipeline Json after templatization " + pipeline_json_str)
+    # print(pipeline_json_str)
+    pipeline_json = json.loads(pipeline_json_str)
+
   return pipeline_json
 
 def un_deploy_pipeline(pipeline_obj):
@@ -429,9 +441,9 @@ class DeviceLogger:
       logger.error(traceback.format_exc())
 
 if __name__ == '__main__':
-  source_file = "data_source_1.json"
-  target_file = "data_target_1.json"
-  logic_file = "data_logic_1.json"
-  vars_file = "data_vars_1.json"
+  source_file = "test_data_source_1.json"
+  target_file = "test_data_target_1.json"
+  logic_file = "test_data_logic_1.json"
+  vars_file = "test_data_vars_1.json"
   pipe_line_json = get_pipeline_json(source_file, target_file, logic_file, vars_file)
   print(pipe_line_json)
