@@ -374,6 +374,7 @@ def get_access_token(device_ip, username="admin", password="None"):
       # res_code != 200:
       logger.debug("Error fetching token for device " + device_ip + str(res_code) + str(res_json))
       print("Error fetching token for device " + device_ip + " Response: " + str(res_json))
+      raise Exception("Error fetching token for device " + device_ip + " Response: " + str(res_json))
   except Exception as ex:
     logger.debug("Exception in get_access_token for device " + device_ip + " " + str(ex))
     raise Exception("Exception in get_access_token for device " + device_ip + " " + str(ex))
