@@ -219,42 +219,6 @@ def get_pipeline_json(data_source_file, data_target_file, data_logic_file=None, 
 
   return pipeline_json
 
-def un_deploy_pipeline(pipeline_obj):
-  device_ip = pipeline_obj[DEVICE_IP]
-  device_pwd = pipeline_obj[PASSWORD]
-  dev_logger = pipeline_obj[LOGGER]
-  pipeline_name = pipeline_obj[PIPELINE_NAME]
-  logger.debug("Started un-deploying pipeline " + pipeline_name + " on device " + device_ip)
-  print("Started un-deploying pipeline", pipeline_name, "on device", device_ip)
-  try:
-    access_token = get_access_token(device_ip, password=device_pwd)
-    url = "https://" + device_ip + "/api/v1/edge-intelligence/pipelines/" + pipeline_name
-    headers = {
-      'Authorization': 'Bearer ' + access_token,
-      'Content-Type': 'application/json'
-    }
-    response = requests.delete(url=url, headers=headers, verify=False)
-    res_json = json.loads(response.text.encode('utf8'))
-    res_code = response.status_code
-    # Check for status
-    if res_code == 200:
-      status = pipeline_obj[STATUS] = "Success"
-      message = pipeline_obj[RESPONSE] = "Status Code: " + str(res_code) + ", Response: " + str(res_json)
-      logger.debug("Successfully un-deployed pipeline for " + pipeline_name + " on device " + device_ip + " " + message)
-    else:
-      # res_code != 200:
-      status = pipeline_obj[STATUS] = "Failed"
-      message = pipeline_obj[RESPONSE] = "Status Code: " + str(res_code) + ", Response: " + str(res_json)
-      logger.debug("Error in un-deploy pipeline for " + pipeline_name + " on device " + device_ip + " " + message)
-  except Exception as ex:
-    status = pipeline_obj[STATUS] = "Failed"
-    message = pipeline_obj[RESPONSE] = str(ex)
-    logger.debug("Exception in un-deploy pipeline for " + pipeline_name + " on device " + device_ip + " " + str(ex))
-
-  dev_logger.info("un-deploy pipeline " + pipeline_name + " on device " + device_ip + " -> Status: " + status + ", " + message)
-  print("Finished un-deploying pipeline " + pipeline_name + " on device " + device_ip + " Status: " + status)
-  logger.debug("Finished un-deploying pipeline " + pipeline_name + " on device " + device_ip + " Status: " + status)
-
 def get_pipeline_status(pipeline_obj):
   device_ip = pipeline_obj[DEVICE_IP]
   device_pwd = pipeline_obj[PASSWORD]
@@ -340,6 +304,42 @@ def deploy_pipeline(pipeline_obj):
   dev_logger.info("deploy pipeline " + pipeline_name + " on device " + device_ip + " -> Status: " + status + ", " + message)
   print("Finished deploying pipeline " + pipeline_name + " on device " + device_ip + " Status: " + status)
   logger.debug("Finished deploying pipeline " + pipeline_name + " on device " + device_ip + " Status: " + status)
+
+def un_deploy_pipeline(pipeline_obj):
+  device_ip = pipeline_obj[DEVICE_IP]
+  device_pwd = pipeline_obj[PASSWORD]
+  dev_logger = pipeline_obj[LOGGER]
+  pipeline_name = pipeline_obj[PIPELINE_NAME]
+  logger.debug("Started un-deploying pipeline " + pipeline_name + " on device " + device_ip)
+  print("Started un-deploying pipeline", pipeline_name, "on device", device_ip)
+  try:
+    access_token = get_access_token(device_ip, password=device_pwd)
+    url = "https://" + device_ip + "/api/v1/edge-intelligence/pipelines/" + pipeline_name
+    headers = {
+      'Authorization': 'Bearer ' + access_token,
+      'Content-Type': 'application/json'
+    }
+    response = requests.delete(url=url, headers=headers, verify=False)
+    res_json = json.loads(response.text.encode('utf8'))
+    res_code = response.status_code
+    # Check for status
+    if res_code == 200:
+      status = pipeline_obj[STATUS] = "Success"
+      message = pipeline_obj[RESPONSE] = "Status Code: " + str(res_code) + ", Response: " + str(res_json)
+      logger.debug("Successfully un-deployed pipeline for " + pipeline_name + " on device " + device_ip + " " + message)
+    else:
+      # res_code != 200:
+      status = pipeline_obj[STATUS] = "Failed"
+      message = pipeline_obj[RESPONSE] = "Status Code: " + str(res_code) + ", Response: " + str(res_json)
+      logger.debug("Error in un-deploy pipeline for " + pipeline_name + " on device " + device_ip + " " + message)
+  except Exception as ex:
+    status = pipeline_obj[STATUS] = "Failed"
+    message = pipeline_obj[RESPONSE] = str(ex)
+    logger.debug("Exception in un-deploy pipeline for " + pipeline_name + " on device " + device_ip + " " + str(ex))
+
+  dev_logger.info("un-deploy pipeline " + pipeline_name + " on device " + device_ip + " -> Status: " + status + ", " + message)
+  print("Finished un-deploying pipeline " + pipeline_name + " on device " + device_ip + " Status: " + status)
+  logger.debug("Finished un-deploying pipeline " + pipeline_name + " on device " + device_ip + " Status: " + status)
 
 def change_password(pipeline_obj):
   device_ip = pipeline_obj[DEVICE_IP]
