@@ -207,17 +207,56 @@ def get_pipeline_json(data_source_file, data_target_file, data_logic_file=None, 
 
   # Apply template variables if applicable
   if data_vars_json is not None:
-    pipeline_json_str = json.dumps(pipeline_json)
-    # print(pipeline_json_str)
-    logger.debug("Pipeline Json before templatization " + pipeline_json_str + " " + data_vars_file)
+    logger.debug("Pipeline Json before templatization " + json.dumps(pipeline_json) + " " + data_vars_file)
     for key, value in data_vars_json.items():
-      temp_var = "$" + key
-      pipeline_json_str = pipeline_json_str.replace(temp_var, str(value))
-    logger.debug("Pipeline Json after templatization " + pipeline_json_str)
-    # print(pipeline_json_str)
-    pipeline_json = json.loads(pipeline_json_str)
+      key = "$" + key
+      # pipeline_json_str = pipeline_json_str.replace(temp_var, str(value))
+      paths = get_var_key_paths(pipeline_json, path_key=key)
+      print(key, ":", paths)
+      # path_dict = update_path_dict(pipeline_json, path_dict=path_dict, path_key=key)
 
+    logger.debug("Pipeline Json after templatization " + json.dumps(pipeline_json))
+    # pipeline_json = json.loads(pipeline_json_str)
   return pipeline_json
+
+def get_var_key_paths(obj, prefix='', path_key="", path_list=[]):
+  if isinstance(obj, dict):
+    for k, v in obj.items():
+      p = "{}['{}']".format(prefix, k)
+      get_var_key_paths(v, prefix=p, path_key=path_key, path_list=path_list)
+      # if v == "$MQTT_QOS" or v == "$INVOKE_INTERVAL":
+      if v == path_key:
+        # Path is starting with {}, replace with empty string
+        path = p.replace("{}", "")
+        path_list.append(path)
+        # print('{} = {}'.format(path_key, repr(path_list)))
+  elif isinstance(obj, list):
+    for i, v in enumerate(obj):
+      p = "{}[{}]".format(prefix, i)
+      get_var_key_paths(v, prefix=p, path_key=path_key, path_list=path_list)
+  else:
+    pass
+    # print('{} = {}'.format(prefix, repr(v)))
+  return path_list
+
+def update_path_dict(obj, prefix='', path_dict=dict(), path_key=""):
+  if isinstance(obj, dict):
+    for k, v in obj.items():
+      p = "{}['{}']".format(prefix, k)
+      update_path_dict(v, prefix=p, path_dict=path_dict, path_key=path_key)
+      # if v == "$MQTT_QOS" or v == "$INVOKE_INTERVAL":
+      if v == path_key:
+        key = p.replace("{}", "")
+        path_dict[key] = v
+        # print('{} = {}'.format(key, repr(path_dict)))
+  elif isinstance(obj, list):
+    for i, v in enumerate(obj):
+      p = "{}[{}]".format(prefix, i)
+      update_path_dict(v, prefix=p, path_dict=path_dict, path_key=path_key)
+  else:
+    pass
+    # print('{} = {}'.format(prefix, repr(v)))
+  return path_dict
 
 def get_pipeline_status(pipeline_obj):
   device_ip = pipeline_obj[DEVICE_IP]
