@@ -3,10 +3,10 @@
         "dataTargetConfiguration": {
             "connectors": [
                 {
-                    "cleanSession": true,
+                    "cleanSession": "$CLEAN_SESSION",
                     "clientId": "gg-4567",
-                    "host": "10.106.11.8",
-                    "mqttQoS": 1,
+                    "host": "$TARGET_HOST",
+                    "mqttQoS": "$MQTT_QOS",
                     "port": 1884,
                     "publish": {
                         "resultPath": {

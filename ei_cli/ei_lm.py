@@ -208,15 +208,59 @@ def get_pipeline_json(data_source_file, data_target_file, data_logic_file=None, 
   # Apply template variables if applicable
   if data_vars_json is not None:
     logger.debug("Pipeline Json before templatization " + json.dumps(pipeline_json) + " " + data_vars_file)
+    path_dict = dict()
     for key, value in data_vars_json.items():
       key = "$" + key
       # pipeline_json_str = pipeline_json_str.replace(temp_var, str(value))
       # paths = list()
       # paths = get_var_key_paths(pipeline_json, path_list=paths, path_key=key)
       # print(key, ":", paths)
-      pipeline_json = update_var_key_path_dict(obj=pipeline_json, path_key=key, path_value=value)
+      # path_dict = update_var_key_path_dict(obj=pipeline_json, path_dict=path_dict, path_key=key, path_value=value)
+      pipeline_json = update_pipeline_obj_dict(obj=pipeline_json, path_key=key, path_value=value)
     logger.debug("Pipeline Json after templatization " + json.dumps(pipeline_json))
   return pipeline_json
+
+def update_pipeline_obj_dict(obj, prefix='', path_key="", path_value=""):
+  if isinstance(obj, dict):
+    for k, v in obj.items():
+      p = "{}[{}]".format(prefix, k)
+      update_pipeline_obj_dict(v, prefix=p, path_key=path_key, path_value=path_value)
+      # if v == "$MQTT_QOS" or v == "$INVOKE_INTERVAL":
+      if v == path_key:
+        p = p.replace("{}", "")
+        obj[k] = path_value
+        print('{} = {} = {}'.format(v, p, path_value))
+  elif isinstance(obj, list):
+    # This is to add index of array to the paths
+    for i, v in enumerate(obj):
+      p = "{}[{}]".format(prefix, i)
+      update_pipeline_obj_dict(v, prefix=p, path_key=path_key, path_value=path_value)
+  else:
+    pass
+    # print('{} = {}'.format(prefix, repr(v)))
+  return obj
+
+def update_var_key_path_dict(obj, prefix='', path_dict=dict(), path_key="", path_value=""):
+  if isinstance(obj, dict):
+    for k, v in obj.items():
+      p = "{}[{}]".format(prefix, k)
+      update_var_key_path_dict(v, prefix=p, path_dict=path_dict, path_key=path_key, path_value=path_value)
+      # if v == "$MQTT_QOS" or v == "$INVOKE_INTERVAL":
+      if v == path_key:
+        p = p.replace("{}", "")
+        path_dict[p] = v
+        obj[k] = path_value
+        print('{} = {}'.format(v, p))
+        print("Key:", v, "Value:", path_value, "Path:", p)
+  elif isinstance(obj, list):
+    # This is to add index of array to the paths
+    for i, v in enumerate(obj):
+      p = "{}[{}]".format(prefix, i)
+      update_var_key_path_dict(v, prefix=p, path_dict=path_dict, path_key=path_key, path_value=path_value)
+  else:
+    pass
+    # print('{} = {}'.format(prefix, repr(v)))
+  return path_dict
 
 def get_var_key_paths(obj, prefix='', path_key="", path_list=[]):
   if isinstance(obj, dict):
@@ -239,29 +283,7 @@ def get_var_key_paths(obj, prefix='', path_key="", path_list=[]):
     # print('{} = {}'.format(prefix, repr(v)))
   return path_list
 
-def update_var_key_path_dict(obj, prefix='', path_dict=dict(), path_key="", path_value=""):
-  if isinstance(obj, dict):
-    for k, v in obj.items():
-      p = "{}[{}]".format(prefix, k)
-      update_var_key_path_dict(v, prefix=p, path_dict=path_dict, path_key=path_key, path_value=path_value)
-      # if v == "$MQTT_QOS" or v == "$INVOKE_INTERVAL":
-      if v == path_key:
-        p = p.replace("{}", "")
-        path_dict[p] = v
-        obj[k] = path_value
-        print('{} = {}'.format(v, p))
-        print("Key:", v, "Value:", path_value, "Path:", p)
-  elif isinstance(obj, list):
-    # This is to add index of array to the paths
-    for i, v in enumerate(obj):
-      p = "{}[{}]".format(prefix, i)
-      update_var_key_path_dict(v, prefix=p, path_dict=path_dict, path_key=path_key, path_value=path_value)
-  else:
-    pass
-    # print('{} = {}'.format(prefix, repr(v)))
-  return obj
-
-def update_pipeline_obj_dict(obj, path_list, path_key, path_value):
+def check_paths(obj, path_list, path_key, path_value):
   # Path list contains str representation of array
   # $INVOKE_INTERVAL : ['[scriptedDataLogic][invokeEvery]']
   # $MQTT_QOS : ['[dataTarget][dataTargetConfiguration][connectors][0][mqttQoS]', '[dataTarget][dataTargetConfiguration][connectors][0][publish][resultPath][mqttQos]']
@@ -274,12 +296,6 @@ def update_pipeline_obj_dict(obj, path_list, path_key, path_value):
     print(paths)
     print("----------------------------------------")
 
-def update_dict(d, path, value):
-  for p in path[:-1]:
-    if (d := d.get(p)) is None:
-      break
-  else:
-    d[path[-1]] = value
 def get_pipeline_status(pipeline_obj):
   device_ip = pipeline_obj[DEVICE_IP]
   device_pwd = pipeline_obj[PASSWORD]
