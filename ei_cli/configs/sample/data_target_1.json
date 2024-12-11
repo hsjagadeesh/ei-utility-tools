@@ -7,7 +7,7 @@
                     "clientId": "gg-4567",
                     "host": "$TARGET_HOST",
                     "mqttQoS": "$MQTT_QOS",
-                    "port": 1884,
+                    "port": 1883,
                     "publish": {
                         "resultPath": {
                             "mqttQos": "$MQTT_QOS",

@@ -1,4 +1,6 @@
 {
-    "INVOKE_INTERVAL": 1500,
-    "MQTT_QOS": 2
+    "INVOKE_INTERVAL": 1000,
+    "MQTT_QOS": 1,
+    "CLEAN_SESSION": true,
+    "TARGET_HOST": "test.mosquitto.org"
 }

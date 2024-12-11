@@ -3,7 +3,7 @@
         "enableCloudCommands": false,
         "invokeEvery": "$INVOKE_INTERVAL",
         "parameters": {},
-        "productive": false,
-        "script": "\u001bbytes:dmFyIGkgPSAwOwoKZnVuY3Rpb24gaW5pdCgpIHsKbG9nZ2VyLmluZm8oJ0luaXRpYWxpemVkJyk7Cn0KCmZ1bmN0aW9uIG9uX3VwZGF0ZSgpIHsKICAKICBvdXRwdXQucHVibGlzaCgpOwp9CgpmdW5jdGlvbiBvbl90aW1lX3RyaWdnZXIoKSB7CmkrKzsKbG9nZ2VyLmluZm8oJ1RpbWUgdHJpZ2dlciA6OicgKyBpKTsKb3V0cHV0LnZhbHVlID0gInRlc3QgIiArIGk7CmxvZ2dlci5pbmZvKGlucHV0LnVua25vd19fbWVtYmVyKQogICAKfQo="
+        "productive": true,
+        "script": "\u001bbytes:dmFyIGkgPSAwOwoKZnVuY3Rpb24gaW5pdCgpIHsKbG9nZ2VyLmluZm8oJ0luaXRpYWxpemVkJyk7Cn0KCmZ1bmN0aW9uIG9uX3VwZGF0ZSgpIHsKICAKICBvdXRwdXQucHVibGlzaCgpOwp9CgpmdW5jdGlvbiBvbl90aW1lX3RyaWdnZXIoKSB7CmkrKzsKbG9nZ2VyLmluZm8oJ1RpbWUgdHJpZ2dlciA6OicgKyBpKTsKcHVibGlzaCgib3V0cHV0IiwgInZhbHVlIGlzICIraSk7Cn0="
     }
 }
