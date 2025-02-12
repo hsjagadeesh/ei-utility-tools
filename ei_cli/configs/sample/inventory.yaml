@@ -1,0 +1,11 @@
+- DEVICE_IP: 10.105.58.120:9001
+  PIPELINE_NAME: pipeline001
+  DATA_SOURCE_FILE: test_data_source_2.json
+  DATA_TARGET_FILE: test_data_target_2.json
+  DATA_VARIABLES_FILE: test_data_vars_2.json
+- DEVICE_IP: 10.105.58.120:9001
+  PIPELINE_NAME: pipeline002
+  DATA_SOURCE_FILE: test_data_source_1.json
+  DATA_LOGIC_FILE: test_data_logic_1.json
+  DATA_TARGET_FILE: test_data_target_1.json
+  DATA_VARIABLES_FILE: test_data_vars_1.json
