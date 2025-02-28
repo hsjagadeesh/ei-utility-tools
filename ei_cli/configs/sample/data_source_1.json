@@ -4,7 +4,6 @@
             "assetId": "gg-4567",
             "dataSourceConfiguration": {
                 "assetId": "gg-4567",
-                "assetTypeId": "2ca238d5-c82a-4e35-848b-4607f918a77f",
                 "clientId": "gg-test-1",
                 "deviceName": "gg-mqtt-sb-1",
                 "endpoints": [
