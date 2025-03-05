@@ -1,5 +1,5 @@
 {
-  "name": "pipeline-template-datalogic",
+  "name": "pipeline-2",
   "data": {
     "dataSources": {
       "mqtt1": {
