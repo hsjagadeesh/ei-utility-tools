@@ -95,7 +95,7 @@ def main():
     elif cli_args.pipeline_command == 'status':
       on_pipeline_status(vars(cli_args), pipeline_status_parser)
     elif cli_args.pipeline_command == 'deploy-template':
-      on_pipeline_deployTemplate(vars(cli_args), pipeline_deploy_parser)
+      on_pipeline_deploy_template(vars(cli_args), pipeline_deploy_parser)
     else:
       parser.print_help()
   elif cli_args.command == 'agent':
@@ -170,8 +170,8 @@ def on_pipeline_deploy(cli_args, parser):
     logger.error("Invalid : pipeline inventory file options :" + str(inventory_file))
     parser.print_help()
 
-def on_pipeline_deployTemplate(cli_args, parser):
-  logger.debug("Calling on_pipeline_deployTemplate()")
+def on_pipeline_deploy_template(cli_args, parser):
+  logger.debug("Calling on_pipeline_deploy_template()")
   inventory_file = cli_args.get("inventory_file", "")
   if is_valid_string(inventory_file):
     common_password = getpass.getpass('Enter the password:')
