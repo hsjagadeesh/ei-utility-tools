@@ -1,41 +1,106 @@
 {
-    "dataSources": {
-        "input": {
-            "assetId": "gg-4567",
-            "dataSourceConfiguration": {
-                "assetId": "gg-4567",
-                "assetTypeId": "2ca238d5-c82a-4e35-848b-4607f918a77f",
-                "clientId": "gg-test-1",
-                "deviceName": "gg-mqtt-sb-1",
-                "endpoints": [
-                    {
-                        "clientId": "gg-test-1",
-                        "metrics": {
-                            "humidity": {
-                                "datatype": "String",
-                                "label": "humidity",
-                                "topic": "humidity"
-                            }
-                        },
-                        "name": "endpoint_1883",
-                        "port": "1883",
-                        "secure": false,
-                        "credentials": []
-                    }
-                ],
-                "name": "endpoint_1883",
-                "port": null,
-                "secure": false,
-                "useWebSockets": false
-            },
-            "fields": [
-                {
-                    "key": "humidity",
-                    "source": "/endpoints/endpoint_1883/gg-test-1/humidity",
-                    "type": "subscription"
-                }
+  "dataSources": {
+    "mqtt1": {
+      "type": "MQTT",
+      "assetId": "1234",
+      "dataSourceConfiguration": {
+        "port": null,
+        "secure": false,
+        "useWebSockets": false,
+        "clientId": "test",
+        "assetId": "1234",
+        "name": "endpoint_1883",
+        "endpoints": [
+          {
+            "clientId": "test",
+            "port": "1883",
+            "credentials": [
+              {
+                "username": "test_user@cisco.com",
+                "password": "Welcome@12345"
+              }
             ],
-            "type": "MQTT"
+            "name": "endpoint_1883",
+            "metrics": {
+              "test": {
+                "name": "test",
+                "label": "test",
+                "datatype": "String",
+                "topic": "test_topic"
+              },
+              "test2": {
+                "name": "test2",
+                "label": "test2",
+                "datatype": "String",
+                "topic": "test_topic2"
+              }
+            },
+            "secure": false,
+            "privateKey": null,
+            "serverCertificate": null
+          }
+        ]
+      },
+      "fields": [
+        {
+          "type": "subscription",
+          "key": "test",
+          "source": "/endpoints/endpoint_1883/test/test_topic"
+        },
+        {
+          "type": "subscription",
+          "key": "test2",
+          "source": "/endpoints/endpoint_1883/test/test_topic2"
+        },
+        {
+          "type": "customAttribute",
+          "key": "custom1",
+          "value": "test_custome_value"
         }
+      ]
+    },
+    "mqtt2": {
+      "type": "MQTT",
+      "assetId": "4567",
+      "dataSourceConfiguration": {
+        "port": null,
+        "secure": false,
+        "useWebSockets": false,
+        "clientId": "gg-mclient-2",
+        "assetId": "4567",
+        "name": "endpoint_1883",
+        "endpoints": [
+          {
+            "clientId": "gg-mclient-2",
+            "port": "1883",
+            "credentials": [
+              {
+                "username": "test_user@cisco.com",
+                "password": "Welcome@12345"
+              }
+            ],
+            "name": "endpoint_1883",
+            "metrics": {
+              "test2": {
+                "name": "test2",
+                "label": "test",
+                "datatype": "String",
+                "topic": "test_topic2"
+              }
+            },
+            "secure": false,
+            "privateKey": null,
+            "serverCertificate": null
+          }
+        ]
+      },
+      "fields": [
+        {
+          "type": "subscription",
+          "key": "test2",
+          "source": "/endpoints/endpoint_1883/gg-mclient-2/test_topic2"
+        }
+      ]
     }
+  }
 }
