@@ -73,6 +73,9 @@ def main():
   pipeline_deploy_parser = pipeline_command_parser.add_parser('deploy', help='deploy data pipeline(s)')
   pipeline_deploy_parser.add_argument('-f', '--file', type=str, dest='inventory_file', help='pipeline(s) inventory file (yaml)')
 
+  pipeline_deploy_parser = pipeline_command_parser.add_parser('deploy-template', help='deploy data pipeline(s)')
+  pipeline_deploy_parser.add_argument('-f', '--file', type=str, dest='inventory_file', help='pipeline(s) inventory file (yaml)')
+
   pipeline_undeploy_parser = pipeline_command_parser.add_parser('undeploy', help='un-deploy data pipeline(s)')
   pipeline_undeploy_parser.add_argument('-f', '--file', type=str, dest='inventory_file', help='pipeline(s) inventory file (yaml)')
 
@@ -91,6 +94,8 @@ def main():
       on_pipeline_undeploy(vars(cli_args), pipeline_undeploy_parser)
     elif cli_args.pipeline_command == 'status':
       on_pipeline_status(vars(cli_args), pipeline_status_parser)
+    elif cli_args.pipeline_command == 'deploy-template':
+      on_pipeline_deployTemplate(vars(cli_args), pipeline_deploy_parser)
     else:
       parser.print_help()
   elif cli_args.command == 'agent':
@@ -165,6 +170,22 @@ def on_pipeline_deploy(cli_args, parser):
     logger.error("Invalid : pipeline inventory file options :" + str(inventory_file))
     parser.print_help()
 
+def on_pipeline_deployTemplate(cli_args, parser):
+  logger.debug("Calling on_pipeline_deployTemplate()")
+  inventory_file = cli_args.get("inventory_file", "")
+  if is_valid_string(inventory_file):
+    common_password = getpass.getpass('Enter the password:')
+    logger.debug("Pipeline deploy selected for " + inventory_file)
+    try:
+      inventory_data = load_inventory(file_name=inventory_file)
+      ei_lm.execute_pipelinesTemplate(inventory_data, operation=ei_lm.DEPLOY, device_pwd=common_password)
+    except Exception as ex:
+      print(traceback.format_exc())
+      logger.error(traceback.format_exc())
+  else:
+    print("\nPlease provide a valid pipeline inventory file option\n")
+    logger.error("Invalid : pipeline inventory file options :" + str(inventory_file))
+    parser.print_help()
 def on_pipeline_undeploy(cli_args, parser):
   logger.debug("Calling on_pipeline_undeploy()")
   common_password = getpass.getpass('Enter the password:')
