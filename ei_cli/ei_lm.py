@@ -23,6 +23,7 @@ CHANGE_PWD = "change-pwd"
 DEVICE_IP = "DEVICE_IP"
 PIPELINE_NAME = "PIPELINE_NAME"
 DATA_SOURCE_FILE = "DATA_SOURCE_FILE"
+PIPELINE_TEMPLATE_FILE = "PIPELINE_TEMPLATE"
 DATA_TARGET_FILE = "DATA_TARGET_FILE"
 DATA_LOGIC_FILE = "DATA_LOGIC_FILE"
 DATA_VARIABLES_FILE = "DATA_VARIABLES_FILE"
@@ -113,6 +114,34 @@ def execute_pipelines(inventory_list, operation=None, device_pwd=None,  new_pass
   # Close the device logger
   # device_logger.close()
 
+def execute_pipelinesTemplate(inventory_list, operation=None, device_pwd=None,  new_password=None):
+  pipeline_obj_list = []
+  logger.debug("Number of objects inventory file " + str(len(inventory_list)))
+  print(inventory_list)
+  device_logger = get_device_logger(operation)
+  # device_logger = DeviceLogger(operation)
+
+  # Create pipeline object list from inventory list
+  for inventory_obj in inventory_list:
+    pipeline_obj = get_pipeline_obj_by_template(inventory_obj, operation)
+    pipeline_obj[PASSWORD] = device_pwd
+    pipeline_obj[NEW_PASSWORD] = new_password
+    pipeline_obj[LOGGER] = device_logger
+    pipeline_obj_list.append(pipeline_obj)
+
+  # Create the pool threads for execution
+  ei_cli_threads = []
+  if len(pipeline_obj_list) > 0:
+    for pipeline_obj in pipeline_obj_list:
+      if pipeline_obj is not None:
+        t = EiCliThread(target=execute_pipeline_obj, args=(operation, pipeline_obj))
+        ei_cli_threads.append(t)
+  # Start the thread execution in batches
+  if len(ei_cli_threads) > 0:
+    run_in_batch(ei_cli_threads, MAX_BATCH_SIZE)
+
+  # Close the device logger
+  # device_logger.close()
 def execute_pipeline_obj(operation=None, pipeline_obj=None):
   if operation is None:
     operation = pipeline_obj[OPERATION]
@@ -183,6 +212,54 @@ def get_pipeline_obj(inventory_obj, operation=None):
 
   return pipeline_obj
 
+def get_pipeline_obj_by_template(inventory_obj, operation=None):
+  pipeline_obj = {}
+  if operation is None:
+    return pipeline_obj
+
+  device_ip = inventory_obj.get(DEVICE_IP, None)
+  pipeline_name = inventory_obj.get(PIPELINE_NAME, None)
+
+  # For any operation, device ip and pipeline name are mandatory
+  if not is_valid_string(device_ip):
+    logger.error("Invalid device ip given in inventory file for inventory obj " + inventory_obj)
+    print("Invalid device ip given in inventory file.")
+    exit(0)
+  if not is_valid_string(pipeline_name):
+    print("Invalid pipeline name given in inventory file.")
+    logger.error("Invalid pipeline name given in inventory file for inventory obj " + inventory_obj)
+    exit(0)
+
+  # This field will contain the response of the api call and will get updated during api call execution
+  pipeline_obj[RESPONSE] = "NA"
+  pipeline_obj[OPERATION] = operation
+  pipeline_obj[DEVICE_IP] = device_ip
+  pipeline_obj[PIPELINE_NAME] = pipeline_name
+
+  # If the operation is un-deploy or get status, then only device ip and pipeline name is needed
+  if operation == STATUS or operation == UN_DEPLOY:
+    return pipeline_obj
+
+  if operation == DEPLOY:
+    pipeline_template_file = inventory_obj.get(PIPELINE_TEMPLATE_FILE, None)
+
+
+    # For deploy, data_source_file and data_target_file are mandatory
+    if not is_valid_string(pipeline_template_file):
+      print("Invalid pipeline template file name given in inventory file.")
+      logger.error("Invalid  pipeline template file name given in inventory file for inventory obj " + inventory_obj)
+      exit(0)
+    #
+    # # For deploy, data logic and data variables are not mandatory
+    # data_logic_file = inventory_obj.get(DATA_LOGIC_FILE, None)
+    # data_vars_file = inventory_obj.get(DATA_VARIABLES_FILE, None)
+
+    # Get the pipeline json obj
+    pipeline_json = get_pipeline_template_json(pipeline_template_file)
+    pipeline_obj[PIPELINE_JSON] = pipeline_json
+
+  return pipeline_obj
+
 def read_json_file(file_name):
   data = None
   if file_name is None:
@@ -204,6 +281,26 @@ def get_pipeline_json(data_source_file, data_target_file, data_logic_file=None, 
     pipeline_json[DATA_OUTPUT_MODEL_KEY] = data_target_json[DATA_OUTPUT_MODEL_KEY]
   if data_logic_json is not None:
     pipeline_json[DATA_LOGIC_KEY] = data_logic_json[DATA_LOGIC_KEY]
+
+  # Apply template variables if applicable
+  if data_vars_json is not None:
+    logger.debug("Pipeline Json before templatization " + json.dumps(pipeline_json) + " " + data_vars_file)
+    path_dict = dict()
+    for key, value in data_vars_json.items():
+      key = "$" + key
+      # pipeline_json_str = pipeline_json_str.replace(temp_var, str(value))
+      # paths = list()
+      # paths = get_var_key_paths(pipeline_json, path_list=paths, path_key=key)
+      # print(key, ":", paths)
+      # path_dict = update_var_key_path_dict(obj=pipeline_json, path_dict=path_dict, path_key=key, path_value=value)
+      pipeline_json = update_pipeline_obj_dict(obj=pipeline_json, path_key=key, path_value=value)
+    logger.debug("Pipeline Json after templatization " + json.dumps(pipeline_json))
+  return pipeline_json
+
+def get_pipeline_template_json(pipeline_template_file, data_vars_file=None):
+  pipeline_json = dict()
+  pipeline_template_json = read_json_file(pipeline_template_file)
+  data_vars_json = read_json_file(data_vars_file)
 
   # Apply template variables if applicable
   if data_vars_json is not None:

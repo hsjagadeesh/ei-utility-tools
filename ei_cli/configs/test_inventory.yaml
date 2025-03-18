@@ -1,5 +1,6 @@
 - DEVICE_IP: 10.105.58.120:9001
   PIPELINE_NAME: p001
+  PIPELINE_TEMPLATE: test_pipeline_template.json
   DATA_SOURCE_FILE: test_data_source.json
   DATA_LOGIC_FILE: test_data_logic.json
   DATA_TARGET_FILE: test_data_target.json
