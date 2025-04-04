@@ -40,6 +40,7 @@ NEW_PASSWORD = "NEW_PASSWORD"
 OPERATION = "OPERATION"
 LOGGER = "LOGGER"
 
+BASE_URL = "/api/v2/edge-intelligence"
 logger = logging.getLogger(__name__)
 
 class EiCliThread(Thread):
@@ -402,7 +403,7 @@ def get_pipeline_status(pipeline_obj):
   print("Started getting pipeline status for", pipeline_name, "on device", device_ip)
   try:
     access_token = get_access_token(device_ip, password=device_pwd)
-    url = "https://" + device_ip + "/api/v1/edge-intelligence/pipelines/" + pipeline_name + "/status"
+    url = "https://" + device_ip + BASE_URL + "/pipelines/" + pipeline_name + "/status"
     headers = {
       'Authorization': 'Bearer ' + access_token,
       'Content-Type': 'application/json'
@@ -445,7 +446,7 @@ def deploy_pipeline(pipeline_obj):
   print("Started deploying pipeline", pipeline_name, "on device", device_ip)
   try:
     access_token = get_access_token(device_ip, password=device_pwd)
-    url = "https://" + device_ip + "/api/v1/edge-intelligence/pipelines"
+    url = "https://" + device_ip + BASE_URL + "/pipelines"
     headers = {
       'Authorization': 'Bearer ' + access_token,
       'Content-Type': 'application/json'
@@ -488,7 +489,7 @@ def un_deploy_pipeline(pipeline_obj):
   print("Started un-deploying pipeline", pipeline_name, "on device", device_ip)
   try:
     access_token = get_access_token(device_ip, password=device_pwd)
-    url = "https://" + device_ip + "/api/v1/edge-intelligence/pipelines/" + pipeline_name
+    url = "https://" + device_ip + BASE_URL + "/pipelines/" + pipeline_name
     headers = {
       'Authorization': 'Bearer ' + access_token,
       'Content-Type': 'application/json'
@@ -523,7 +524,7 @@ def change_password(pipeline_obj):
   dev_logger = pipeline_obj[LOGGER]
   logger.debug("Started changing password on device " + device_ip)
   print("Started changing password on device " + device_ip)
-  url = "https://" + device_ip + "/api/v1/edge-intelligence/change-password"
+  url = "https://" + device_ip + BASE_URL + "/change-password"
   post_data = {
     "username": username,
     "old_password": old_device_pwd,
@@ -554,11 +555,13 @@ def change_password(pipeline_obj):
 
 def get_access_token(device_ip, username="admin", password="None"):
   access_token = None
-  url = "https://" + device_ip + "/api/v1/edge-intelligence/token"
+  url = "https://" + device_ip + BASE_URL + "/token"
+  print("fetching token for device " + url)
   post_data = {
     "username": username,
     "password": password
   }
+  print("fetching token for device " + post_data)
   logger.debug("Fetching access token for device " + device_ip)
   try:
     headers = {'Content-Type': 'application/json'}
