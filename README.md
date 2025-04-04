@@ -49,16 +49,18 @@ PS C:\Users\Administrator>
 Note: (Ensure the path is always enclosed in double quotes; otherwise, it will throw an error.)
 
 #### For Windows CMD
-
->set EI_CLI_HOME="<path_to_eilm_home_dir>"
-
+```
+set EI_CLI_HOME="<path_to_eilm_home_dir>"
+```
 Example:
-> set EI_CLI_HOME="C:\Users\Administrator\eilm-cli" 
-
+```
+set EI_CLI_HOME="C:\Users\Administrator\eilm-cli" 
+```
 OR
- 
-> set EI_CLI_HOME=C:\Users\Administrator\eilm-cli
-
+```
+set EI_CLI_HOME=C:\Users\Administrator\eilm-cli
+```
+To get the variable value 
 ```
 C:\Users\Administrator> echo %EI_CLI_HOME%
 "C:\Users\Administrator\eilm-cli"
@@ -113,8 +115,9 @@ options:
 #### Step 1
 The user needs to create a pipeline inventory file under the configs folder. This file will contain all the required configuration (like device info, configuration, etc) for the pipeline to be deployed. 
 Before creating the pipeline inventory file, the user also needs to create few configuration files which will be used in the pipeline-inventory file described in Step 2
-
-> cd <ei_cli_home>/configs
+```
+cd <ei_cli_home>/configs
+```
 
 #### Step 2 
 Below are the required individual configuration files for the pipeline (data_source, data_logic, data_target, and data_variables). Please refer to the sample configuration files, which will be used in the pipeline inventory file
@@ -603,7 +606,9 @@ Examples:
 If you encounter issues:
 Review the log files for error details. Verify the inventory.yaml file for accuracy.  Ensure all dependencies are installed and up to date.
 For additional command details, refer to the help command 
-> eilm-cli --help
+```
+eilm-cli --help
+```
 
 ## EI Scale Utility Script (ei-scale-utility.sh)
 
